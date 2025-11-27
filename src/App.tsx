@@ -208,11 +208,11 @@ export default function Portfolio() {
               <div className="relative group">
                 {/* Decorative border effect */}
                 <div className="absolute -inset-1 bg-gradient-to-r from-white/20 to-white/5 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-500"></div>
-                <div className="relative w-72 h-[450px] md:w-80 md:h-[500px] lg:w-96 lg:h-[550px] rounded-3xl overflow-hidden border border-white/20 bg-gradient-to-br from-white/5 to-transparent">
+                <div className="relative w-64 h-80 md:w-80 md:h-[500px] lg:w-96 lg:h-[550px] rounded-3xl overflow-hidden border border-white/20 bg-gradient-to-br from-white/5 to-transparent">
                   <img
                     src="/me-portrait.webp"
                     alt="Dewan Shakil Akhtar"
-                    className="w-full h-full object-cover grayscale-[50%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700"
                   />
                 </div>
               </div>
