@@ -241,8 +241,9 @@ export default function Portfolio() {
             <div className="space-y-6 text-lg text-white/70 leading-relaxed">
               <p>
                 With years of experience in full-stack development, I specialize
-                in building modern web applications that scale. My focus is on
-                creating clean, efficient solutions that solve real problems.
+                in building modern web & mobile applications that scale. My
+                focus is on creating clean, efficient solutions that solve real
+                problems.
               </p>
               <p>
                 I've founded multiple successful startups and worked with
