@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import {
   Github,
   Linkedin,
@@ -7,20 +7,19 @@ import {
   ExternalLink,
   Menu,
   X,
-  MoveDownIcon,
-  ArrowDown,
   Youtube,
+  Mail,
+  ArrowUpRight,
 } from "lucide-react";
 import { Button } from "./components/ui/button";
-import { Card, CardContent } from "./components/ui/card";
-import { motion, useScroll, useTransform, easeOut } from "framer-motion";
+import { motion } from "framer-motion";
 
 const fadeIn = {
-  hidden: { opacity: 0, y: 24 },
+  hidden: { opacity: 0, y: 20 },
   visible: (delay = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: easeOut, delay },
+    transition: { duration: 0.5, delay },
   }),
 };
 
@@ -28,40 +27,34 @@ export default function Portfolio() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const toggleMenu = () => setIsMenuOpen((v) => !v);
 
-  // Parallax for hero section
-  const { scrollY } = useScroll();
-  const yHero = useTransform(scrollY, [0, 300], [0, 40]);
-  const opacityHero = useTransform(scrollY, [0, 300], [1, 0.85]);
-
   return (
-    <div className={` bg-black text-white max-w-screen`}>
+    <div className="bg-black text-white min-h-screen">
       {/* Header */}
       <motion.header
-        initial={{ y: -40, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ type: "tween", duration: 0.5, ease: "easeOut" }}
-        className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-sm border-b border-gray-800"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-md border-b border-white/10"
       >
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+        <div className="container mx-auto px-6 lg:px-12 py-6 flex justify-between items-center">
           <div
-            className="text-2xl font-extrabold tracking-tight font-[Montserrat,Inter,sans-serif] cursor-pointer"
+            className="text-xl font-bold tracking-tight cursor-pointer"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           >
-            MRDSA.DEV
+            mrDSA.dev
           </div>
-          <nav className="hidden md:flex space-x-8">
-            {["about", "experience", "projects", "contact"].map((id, i) => (
+          <nav className="hidden md:flex space-x-10">
+            {["About", "Experience", "Work", "Contact"].map((item, i) => (
               <motion.a
-                key={id}
-                href={`#${id}`}
-                className="hover:text-gray-300 transition-colors font-bold tracking-wide font-[Montserrat,Inter,sans-serif] relative group"
+                key={item}
+                href={`#${item.toLowerCase()}`}
+                className="text-sm uppercase tracking-wider hover:text-white/60 transition-colors"
                 initial="hidden"
                 animate="visible"
                 variants={fadeIn}
-                custom={0.1 + i * 0.05}
+                custom={i * 0.1}
               >
-                {id.charAt(0).toUpperCase() + id.slice(1)}
-                <span className="block h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-200" />
+                {item}
               </motion.a>
             ))}
           </nav>
@@ -75,20 +68,19 @@ export default function Portfolio() {
         </div>
         {isMenuOpen && (
           <motion.nav
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -20, opacity: 0 }}
-            className="md:hidden bg-black border-t border-gray-800"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="md:hidden bg-black border-t border-white/10"
           >
-            <div className="container mx-auto px-4 py-4 flex flex-col space-y-4">
-              {["about", "experience", "projects", "contact"].map((id) => (
+            <div className="container mx-auto px-6 py-6 flex flex-col space-y-4">
+              {["About", "Experience", "Work", "Contact"].map((item) => (
                 <a
-                  key={id}
-                  href={`#${id}`}
-                  className="hover:text-gray-300 transition-colors font-bold py-2"
+                  key={item}
+                  href={`#${item.toLowerCase()}`}
+                  className="text-sm uppercase tracking-wider hover:text-white/60 transition-colors"
                   onClick={toggleMenu}
                 >
-                  {id.charAt(0).toUpperCase() + id.slice(1)}
+                  {item}
                 </a>
               ))}
             </div>
@@ -97,248 +89,248 @@ export default function Portfolio() {
       </motion.header>
 
       {/* Hero Section */}
-      <section className="min-h-[80vh] flex items-center justify-center px-4 pt-24">
-        <motion.div
-          style={{ y: yHero, opacity: opacityHero }}
-          className="w-full max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-12"
-        >
-          {/* Left: Image */}
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={fadeIn}
-            custom={0.1}
-            className="flex-shrink-0"
-          >
-            <div className="relative w-64 h-80 rounded-3xl overflow-hidden shadow-2xl bg-gray-800 flex items-center justify-center border-2 border-white group">
-              <img
-                src="/me-portrait.webp"
-                alt="Dewan Shakil Akhtar"
-                className="object-cover "
-              />
-            </div>
-          </motion.div>
-          {/* Right: Text */}
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={fadeIn}
-            custom={0.2}
-            className="flex-1 text-left"
-          >
-            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight font-[Montserrat,Inter,sans-serif] mb-4 leading-tight">
-              Dewan Shakil <br className="hidden md:block" />
-              Akhtar
-            </h1>
-            <p
-              className="text-lg md:text-2xl text-gray-300 mb-8 font-extralight"
-              style={{ fontFamily: "var(--font-plus-jakarta)" }}
+      <section className="min-h-screen flex items-center justify-center px-6 lg:px-12 pt-24 pb-12">
+        <div className="max-w-7xl w-full">
+          <div className="grid lg:grid-cols-[1.2fr,1fr] gap-16 items-center">
+            {/* Left - Text Content */}
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={fadeIn}
+              className="space-y-10 order-2 lg:order-1"
             >
-              Full Stack Developer & Founder
-            </p>
-            <p
-              className="text-lg md:text-xl text-gray-400 mb-4 font-extralight"
-              style={{ fontFamily: "var(--font-plus-jakarta)" }}
-            >
-              <span className="font-bold text-white">Email me:</span>{" "}
-              <a
-                href="mailto:hi@mrdsa.dev"
-                className=" font-semibold hover:text-blue-400 transition-colors text-white"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                hi@mrdsa.dev
-              </a>
-            </p>
-            <div className="flex flex-wrap gap-4 mb-8">
-              {[
-                {
-                  label: "Resume",
-                  icon: <Download className="mr-2 h-4 w-4" />,
-                  onClick: () => window.open("/resume.pdf", "_blank"),
-                  className: "bg-white text-black hover:bg-gray-700",
-                },
-                {
-                  label: "GitHub",
-                  icon: <Github className="mr-2 h-4 w-4" />,
-                  onClick: () =>
-                    window.open("https://github.com/imdewan", "_blank"),
-                  className:
-                    "bg-black text-white border-white hover:bg-gray-900 hover:text-white",
-                },
-                {
-                  label: "LinkedIn",
-                  icon: <Linkedin className="mr-2 h-4 w-4" />,
-                  onClick: () =>
-                    window.open("https://linkedin.com/in/mrdsa04", "_blank"),
-                  className:
-                    "bg-black text-white border-white hover:bg-gray-900 hover:text-white",
-                },
-                {
-                  label: "Twitter",
-                  icon: <Twitter className="mr-2 h-4 w-4" />,
-                  onClick: () => window.open("https://x.com/mrdsa04", "_blank"),
-                  className:
-                    "bg-black text-white border-white hover:bg-gray-900 hover:text-white",
-                },
-                {
-                  label: "YouTube",
-                  icon: <Youtube className="mr-2 h-4 w-4" />,
-                  onClick: () =>
-                    window.open("https://youtube.com/@dewanshakilyt", "_blank"),
-                  className:
-                    "bg-black text-white border-white hover:bg-gray-900 hover:text-white",
-                },
-              ].map((btn, i) => (
+              <div className="space-y-6">
                 <motion.div
-                  key={btn.label}
-                  initial="hidden"
-                  animate="visible"
-                  variants={fadeIn}
-                  custom={0.3 + i * 0.07}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6 }}
                 >
-                  <Button
-                    variant="outline"
-                    className={`${btn.className} transition-transform duration-200 hover:scale-105`}
-                    onClick={btn.onClick}
-                  >
-                    {btn.icon}
-                    {btn.label}
-                  </Button>
+                  <p className="text-sm uppercase tracking-widest text-white/80 mb-4">
+                    Full Stack Developer & Founder
+                  </p>
+                  <h1 className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight leading-[1.1]">
+                    Dewan Shakil
+                    <br />
+                    Akhtar
+                  </h1>
                 </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </motion.div>
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                  className="text-lg md:text-xl text-white/60 leading-relaxed max-w-xl"
+                >
+                  Building scalable applications and digital products that solve
+                  real problems. Specialized in modern web technologies and
+                  startup development.
+                </motion.p>
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="flex flex-wrap gap-4"
+              >
+                <Button
+                  variant="outline"
+                  className="bg-white text-black hover:bg-gray-700 border-0 h-12 px-6"
+                  onClick={() => window.open("/resume.pdf", "_blank")}
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Resume
+                </Button>
+                <Button
+                  variant="outline"
+                  className="bg-black text-white border-2 border-white/20 hover:bg-white/10 h-12 px-6"
+                  onClick={() => window.open("mailto:hi@mrdsa.dev", "_blank")}
+                >
+                  <Mail className="mr-2 h-4 w-4" />
+                  hi@mrdsa.dev
+                </Button>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="flex items-center gap-6 pt-2"
+              >
+                <span className="text-xs uppercase tracking-widest text-white/30">
+                  Connect
+                </span>
+                <div className="flex gap-5">
+                  {[
+                    {
+                      icon: Github,
+                      url: "https://github.com/imdewan",
+                      label: "GitHub",
+                    },
+                    {
+                      icon: Linkedin,
+                      url: "https://linkedin.com/in/mrdsa04",
+                      label: "LinkedIn",
+                    },
+                    {
+                      icon: Twitter,
+                      url: "https://x.com/mrdsa04",
+                      label: "Twitter",
+                    },
+                    {
+                      icon: Youtube,
+                      url: "https://youtube.com/@dewanshakilyt",
+                      label: "YouTube",
+                    },
+                  ].map((social) => (
+                    <motion.a
+                      key={social.label}
+                      href={social.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-white/40 hover:text-white transition-colors"
+                      whileHover={{ scale: 1.15, y: -2 }}
+                      aria-label={social.label}
+                    >
+                      <social.icon size={22} />
+                    </motion.a>
+                  ))}
+                </div>
+              </motion.div>
+            </motion.div>
+
+            {/* Right - Profile Image */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.2 }}
+              className="flex justify-center lg:justify-end order-1 lg:order-2"
+            >
+              <div className="relative group">
+                {/* Decorative border effect */}
+                <div className="absolute -inset-1 bg-gradient-to-r from-white/20 to-white/5 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-500"></div>
+                <div className="relative w-72 h-[450px] md:w-80 md:h-[500px] lg:w-96 lg:h-[550px] rounded-3xl overflow-hidden border border-white/20 bg-gradient-to-br from-white/5 to-transparent">
+                  <img
+                    src="/me-portrait.webp"
+                    alt="Dewan Shakil Akhtar"
+                    className="w-full h-full object-cover grayscale-[50%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
+                  />
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-10 px-4 relative">
-        <div className=" mx-auto">
+      <section
+        id="about"
+        className="py-32 px-6 lg:px-12 border-t border-white/10"
+      >
+        <div className="max-w-6xl mx-auto">
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeIn}
-            custom={0.1}
+            className="grid md:grid-cols-2 gap-16"
           >
-            <div className="w-full flex justify-center items-center mb-0 relative">
-              <img
-                src="/curve.svg"
-                alt="Decorative Curve"
-                className="w-full max-w-lg"
-              />
-              <button
-                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border-2 border-gray-200 rounded-full w-8 h-8 flex items-center justify-center p-2 hover:bg-gray-100 transition"
-                onClick={() => {
-                  const aboutSection = document.getElementById("about");
-                  if (aboutSection) {
-                    aboutSection.scrollIntoView({ behavior: "smooth" });
-                  }
-                }}
-                aria-label="Scroll Down"
-              >
-                <ArrowDown className="h-4 w-4 text-gray-600" />
-              </button>
+            <div>
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">About</h2>
+              <div className="w-16 h-1 bg-white mb-8" />
             </div>
-            <Card className="bg-white text-black shadow-xl relative overflow-visible mt-0 border-0 rounded-xl">
-              <CardContent className="p-8 md:p-12">
-                <div className="text-center">
-                  <p
-                    className="mb-8 leading-relaxed font-extralight mt-20 mb-20 text-2xl md:text-3xl"
-                    style={{
-                      fontFamily: "var(--font-plus-jakarta)",
-                    }}
-                  >
-                    With years of experience in full-stack development, I have
-                    built and scaled applications that serve thousands of users.
-                    I specialize in modern web technologies and have a passion
-                    for creating innovative solutions.
-                  </p>
-
-                  <div className="text-7xl z-10! md:text-9xl font-extrabold mb-4 mt-32 font-[Montserrat,Inter,sans-serif] tracking-tight">
-                    S I N C E &nbsp;2 0 2 0
-                  </div>
-                  <div
-                    className="bg-white -z-50 w-full h-8 border-t-2 border-gray-200 shadow-[0_-8px_16px_-8px_rgba(0,0,0,0.10)] hidden md:block"
-                    style={{ transform: "translateY(-3rem)" }}
-                  ></div>
-                  <p
-                    className="text-gray-600 font-extralight mb-8 text-xl md:text-xl"
-                    style={{ fontFamily: "var(--font-plus-jakarta)" }}
-                  >
-                    I have worked with businesses of all sizes to create
-                    engaging websites and robust applications that drive results
-                    and user engagement.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="space-y-6 text-lg text-white/70 leading-relaxed">
+              <p>
+                With years of experience in full-stack development, I specialize
+                in building modern web applications that scale. My focus is on
+                creating clean, efficient solutions that solve real problems.
+              </p>
+              <p>
+                I've founded multiple successful startups and worked with
+                clients across the globe, delivering high-quality products that
+                drive results and user engagement.
+              </p>
+              <div className="pt-6">
+                <p className="text-white font-semibold text-2xl">Since 2020</p>
+              </div>
+            </div>
           </motion.div>
         </div>
       </section>
 
       {/* Experience Section */}
-      <section id="experience" className="py-20 px-4">
-        <div className="max-w-4xl mx-auto">
+      <section
+        id="experience"
+        className="py-32 px-6 lg:px-12 border-t border-white/10"
+      >
+        <div className="max-w-6xl mx-auto">
           <motion.h2
-            className="text-4xl md:text-6xl font-extrabold mb-12 text-center font-[Montserrat,Inter,sans-serif] tracking-tight"
+            className="text-4xl md:text-5xl font-bold mb-16"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeIn}
-            custom={0.1}
           >
-            EXPERIENCE
+            Experience
           </motion.h2>
-          <div className="space-y-8">
+          <div className="space-y-2">
             {[
               {
                 company: "NOOL",
                 role: "Founding Engineer",
-                desc: "Built React Native app with Convex backend",
+                desc: "React Native app with Convex backend",
+                url: "https://thenool.com",
               },
               {
-                company: "LEDREF.COM",
+                company: "Ledref",
                 role: "Founder & Full Stack Developer",
                 desc: "Newsletter Platform",
+                url: "https://ledref.com",
               },
               {
-                company: "COLDPEN.IO",
+                company: "ColdPen",
                 role: "Founder & Full Stack Developer",
                 desc: "Cold Email Platform",
+                url: "https://coldpen.io",
               },
               {
-                company: "FREELANCER.COM",
+                company: "Freelance",
                 role: "Full Stack Developer",
-                desc: "Various Projects",
+                desc: "Various client projects",
+                url: null,
               },
             ].map((exp, i) => (
               <motion.div
                 key={exp.company}
-                className="flex flex-col md:flex-row justify-between items-start md:items-center py-6 border-b border-gray-800"
+                className="group py-8 border-b border-white/10 last:border-0"
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={fadeIn}
-                custom={0.15 + i * 0.08}
+                custom={i * 0.1}
               >
-                <div>
-                  <h3 className="text-2xl font-bold font-[Montserrat,Inter,sans-serif]">
-                    {exp.company}
-                  </h3>
-                  <p
-                    className="text-gray-400 font-extralight"
-                    style={{ fontFamily: "var(--font-plus-jakarta)" }}
-                  >
-                    {exp.role}
-                  </p>
-                </div>
-                <div
-                  className="text-gray-400 mt-2 md:mt-0 font-extralight"
-                  style={{ fontFamily: "var(--font-plus-jakarta)" }}
-                >
-                  {exp.desc}
+                <div className="grid md:grid-cols-3 gap-6 items-start">
+                  <div>
+                    {exp.url ? (
+                      <a
+                        href={exp.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-2xl font-bold hover:text-white/60 transition-colors inline-flex items-center gap-2"
+                      >
+                        {exp.company}
+                        <ArrowUpRight
+                          size={20}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity"
+                        />
+                      </a>
+                    ) : (
+                      <h3 className="text-2xl font-bold">{exp.company}</h3>
+                    )}
+                  </div>
+                  <div className="text-white/60">{exp.role}</div>
+                  <div className="text-white/40 text-sm md:text-right">
+                    {exp.desc}
+                  </div>
                 </div>
               </motion.div>
             ))}
@@ -346,506 +338,279 @@ export default function Portfolio() {
         </div>
       </section>
 
-      <section id="projects" className="py-10 px-4 relative">
-        <div className="mx-auto">
+      {/* Work/Projects Section */}
+      <section
+        id="work"
+        className="py-32 px-6 lg:px-12 border-t border-white/10"
+      >
+        <div className="max-w-6xl mx-auto">
+          <motion.h2
+            className="text-4xl md:text-5xl font-bold mb-16"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeIn}
+          >
+            Selected Work
+          </motion.h2>
+          <div className="grid md:grid-cols-2 gap-12">
+            {[
+              {
+                title: "Ledref",
+                desc: "Newsletter platform with drag-and-drop editor, AI tools, and analytics.",
+                url: "https://ledref.com",
+                img: "/images/ledref-screenshot.jpeg",
+              },
+              {
+                title: "ColdPen",
+                desc: "Simple cold email platform for founders who want results.",
+                url: "https://coldpen.io",
+                img: "/images/coldpen-screenshot.png",
+              },
+            ].map((project, i) => (
+              <motion.a
+                key={project.title}
+                href={project.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group block space-y-6"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeIn}
+                custom={i * 0.1}
+              >
+                <div className="aspect-video bg-white/5 rounded-lg overflow-hidden border border-white/10">
+                  <img
+                    src={project.img}
+                    alt={project.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold mb-2 group-hover:text-white/60 transition-colors flex items-center gap-2">
+                    {project.title}
+                    <ArrowUpRight
+                      size={20}
+                      className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    />
+                  </h3>
+                  <p className="text-white/60">{project.desc}</p>
+                </div>
+              </motion.a>
+            ))}
+          </div>
+
+          {/* Testimonials */}
+          <div className="mt-32">
+            <h3 className="text-3xl font-bold mb-12">Testimonials</h3>
+            <div className="grid md:grid-cols-2 gap-8">
+              {[
+                {
+                  quote:
+                    "Kind, polite, and a truly good freelancer. Dewan was always available for questions, responded quickly, and delivered exactly what I needed.",
+                  name: "Ahmet Fuat Y.",
+                  company: "Founder of Solar Curtain",
+                },
+                {
+                  quote:
+                    "Dewan did well in removing all the bugs from my code and is available 24/7 to respond to enquiries. He is a very good developer.",
+                  name: "Abhi Patel",
+                  company: "Client",
+                },
+              ].map((testimonial, i) => (
+                <motion.div
+                  key={testimonial.name}
+                  className="p-8 border border-white/10 rounded-lg"
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={fadeIn}
+                  custom={i * 0.1}
+                >
+                  <p className="text-white/70 mb-6 italic">
+                    "{testimonial.quote}"
+                  </p>
+                  <div>
+                    <p className="font-semibold">{testimonial.name}</p>
+                    <p className="text-white/40 text-sm">
+                      {testimonial.company}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Tech Stack */}
+          <div className="mt-32">
+            <h3 className="text-3xl font-bold mb-12">Technologies</h3>
+            <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-8 gap-8">
+              {[
+                {
+                  name: "Firebase",
+                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/firebase.png",
+                },
+                {
+                  name: "Supabase",
+                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/supabase.png",
+                },
+                {
+                  name: "JavaScript",
+                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/javascript.png",
+                },
+                {
+                  name: "React",
+                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/react.png",
+                },
+                {
+                  name: "TypeScript",
+                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/typescript.png",
+                },
+                {
+                  name: "Node.js",
+                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/node_js.png",
+                },
+                {
+                  name: "Next.js",
+                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/next_js.png",
+                },
+                {
+                  name: "Expo",
+                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/expo.png",
+                },
+                {
+                  name: "Python",
+                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/python.png",
+                },
+                {
+                  name: "PHP",
+                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/php.png",
+                },
+                {
+                  name: "Go",
+                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/go.png",
+                },
+                {
+                  name: "Flutter",
+                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/flutter.png",
+                },
+                {
+                  name: "PostgreSQL",
+                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/postgresql.png",
+                },
+                {
+                  name: "MySQL",
+                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/mysql.png",
+                },
+                {
+                  name: "Arduino",
+                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/arduino.png",
+                },
+                {
+                  name: "Docker",
+                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/docker.png",
+                },
+              ].map((tech, i) => (
+                <motion.div
+                  key={tech.name}
+                  className="flex flex-col items-center gap-3 opacity-60 hover:opacity-100 transition-opacity"
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={fadeIn}
+                  custom={i * 0.05}
+                >
+                  <img
+                    src={tech.icon}
+                    alt={tech.name}
+                    className={`w-12 h-12 ${tech.name === "Expo" ? "bg-white rounded-lg p-2" : ""}`}
+                  />
+                  <span className="text-xs text-white/60">{tech.name}</span>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section
+        id="contact"
+        className="py-32 px-6 lg:px-12 border-t border-white/10"
+      >
+        <div className="max-w-6xl mx-auto">
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeIn}
-            custom={0.1}
+            className="space-y-8"
           >
-            <div className="w-full flex justify-center items-center mb-0 relative">
-              <img
-                src="/curve.svg"
-                alt="Decorative Curve"
-                className="w-full max-w-lg"
-              />
-              <button
-                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border-2 border-gray-200 rounded-full w-8 h-8 flex items-center justify-center p-2 hover:bg-gray-100 transition"
-                onClick={() => {
-                  const projectsSection = document.getElementById("projects");
-                  if (projectsSection) {
-                    projectsSection.scrollIntoView({ behavior: "smooth" });
-                  }
-                }}
-                aria-label="Scroll Down"
-              >
-                <ArrowDown className="h-4 w-4 text-gray-600" />
-              </button>
-            </div>
-            <Card className="bg-white text-black shadow-xl relative overflow-visible mt-0 border-0 rounded-xl">
-              <CardContent className="p-8 md:p-12">
-                <div className="text-center mb-24 mt-16">
-                  <h2 className="text-4xl md:text-8xl font-extrabold mb-16 font-[Montserrat,Inter,sans-serif] tracking-tight">
-                    MY STARTUPS
-                  </h2>
-                </div>
-                <div className="grid md:grid-cols-2 gap-16 mb-32">
-                  {[
-                    {
-                      img: "/images/ledref-screenshot.jpeg",
-                      alt: "Ledref.com Screenshot",
-                      title: "Ledref",
-                      desc: "A powerful newsletter building platform with drag-and-drop editor, AI tools, and comprehensive analytics for everyone.",
-                      url: "https://ledref.com",
-                    },
-                    {
-                      img: "/images/coldpen-screenshot.png",
-                      alt: "ColdPen.io Screenshot",
-                      title: "ColdPen",
-                      desc: "A simple, effective cold email platform designed for founders who want results without complicated dashboards or bloat.",
-                      url: "https://coldpen.io",
-                    },
-                  ].map((proj, i) => (
-                    <motion.div
-                      key={proj.title}
-                      className="space-y-8 p-6 border border-1 border-black rounded-2xl flex flex-col items-center pb-10"
-                      initial="hidden"
-                      whileInView="visible"
-                      viewport={{ once: true }}
-                      variants={fadeIn}
-                      custom={0.2 + i * 0.08}
-                    >
-                      <div className="aspect-video bg-gray-200 rounded-xl overflow-hidden shadow-lg w-full ">
-                        <img
-                          src={proj.img}
-                          alt={proj.alt}
-                          width={800}
-                          height={450}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <h3 className="text-4xl font-bold font-[Montserrat,Inter,sans-serif]">
-                        {proj.title}
-                      </h3>
-                      <p
-                        className="text-gray-600 font-extralight text-lg  text-center"
-                        style={{ fontFamily: "var(--font-plus-jakarta)" }}
-                      >
-                        {proj.desc}
-                      </p>
-                      <Button
-                        variant="outline"
-                        className="bg-black text-white transition-transform duration-200 hover:scale-105 px-8 py-4 text-lg"
-                        onClick={() => window.open(proj.url, "_blank")}
-                      >
-                        <ExternalLink className="mr-2 h-5 w-5" />
-                        Visit Site
-                      </Button>
-                    </motion.div>
-                  ))}
-                </div>
-
-                {/* Testimonials */}
-                <div className="mb-32">
-                  <h2 className="text-4xl md:text-8xl font-extrabold mb-16 font-[Montserrat,Inter,sans-serif] tracking-tight text-center">
-                    TESTIMONIALS
-                  </h2>
-                  <div className="h-16" />
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
-                    {[
-                      {
-                        quote:
-                          "Kind, polite, and a truly good freelancer. I want to hire him again. Dewan was always available for questions, responded quickly, and delivered exactly what I needed. Highly recommended for anyone looking for a reliable developer.",
-                        name: "Ahmet Fuat Y.",
-                        company: "Founder of Solar Curtain",
-                        img: "/images/ahmel_client.webp",
-                      },
-                      {
-                        quote:
-                          "Dewan did well in removing all the bugs from my code and is available 24/7 to respond to enquiries. He is a very good developer and I will hire him again for my next project.",
-                        name: "Abhi Patel",
-                        company: "Via Freelancer",
-                        img: "/images/abhi_client.webp",
-                      },
-                    ].map((t, i) => (
-                      <motion.div
-                        key={t.name}
-                        className="flex flex-col md:flex-row gap-8 items-center md:items-start"
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true }}
-                        variants={fadeIn}
-                        custom={0.3 + i * 0.08}
-                      >
-                        <div className="w-24 h-24 md:w-32 md:h-32 rounded-lg overflow-hidden shrink-0 mx-auto md:mx-0">
-                          <img
-                            src={t.img}
-                            alt={t.name}
-                            width={128}
-                            height={128}
-                            className="object-cover w-full h-full"
-                          />
-                        </div>
-                        <div className="flex flex-col">
-                          <div className=" text-5xl font-bold  font-['Times_New_Roman',serif]">
-                            “
-                          </div>
-                          <p
-                            className="text-gray-700 text-lg md:text-xl mb-4"
-                            style={{ fontFamily: "var(--font-plus-jakarta)" }}
-                          >
-                            {t.quote}
-                          </p>
-                          <div className="font-bold text-xl">{t.name}</div>
-                          <div className="text-gray-500">{t.company}</div>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                  {/* Rotating testimonials carousel */}
-                  <motion.div
-                    className="mt-24"
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                    variants={fadeIn}
-                    custom={0.4}
-                  >
-                    <div className="relative overflow-hidden py-8">
-                      {/* Marquee effect: seamless, continuous left-to-right */}
-                      <div className="flex gap-8 whitespace-nowrap relative">
-                        <motion.div
-                          className="flex gap-8"
-                          style={{ minWidth: "100%" }}
-                          animate={{ x: ["0%", "-50%"] }}
-                          transition={{
-                            repeat: Infinity,
-                            repeatType: "loop",
-                            duration: 18,
-                            ease: "linear",
-                          }}
-                        >
-                          {[
-                            {
-                              quote:
-                                "Exceptional developer with incredible attention to detail.",
-                              name: "Alex Johnson",
-                              company: "Tech Innovators",
-                            },
-                            {
-                              quote:
-                                "Fast delivery and top-notch quality code.",
-                              name: "Sarah Williams",
-                              company: "Digital Solutions",
-                            },
-                            {
-                              quote:
-                                "A true professional who understands business needs.",
-                              name: "Robert Chen",
-                              company: "Growth Partners",
-                            },
-                          ]
-                            .concat([
-                              {
-                                quote:
-                                  "Exceptional developer with incredible attention to detail.",
-                                name: "Alex Johnson",
-                                company: "Tech Innovators",
-                              },
-                              {
-                                quote:
-                                  "Fast delivery and top-notch quality code.",
-                                name: "Sarah Williams",
-                                company: "Digital Solutions",
-                              },
-                              {
-                                quote:
-                                  "A true professional who understands business needs.",
-                                name: "Robert Chen",
-                                company: "Growth Partners",
-                              },
-                            ])
-                            .map((item, i) => (
-                              <div
-                                key={`marquee-${i}`}
-                                className="inline-flex shrink-0 items-center bg-gray-50 px-6 py-4 rounded-xl mx-2"
-                              >
-                                <p
-                                  className="mr-4 font-medium"
-                                  style={{
-                                    fontFamily: "var(--font-plus-jakarta)",
-                                  }}
-                                >
-                                  "{item.quote}"
-                                </p>
-                                <div className="shrink-0">
-                                  <div className="font-bold text-sm">
-                                    {item.name}
-                                  </div>
-                                  <div className="text-gray-500 text-xs">
-                                    {item.company}
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                        </motion.div>
-                      </div>
-                      <div className="h-16" />
-                    </div>
-                  </motion.div>
-                </div>
-
-                {/* Questions / FAQ */}
-                <div className="mb-16">
-                  <h2 className="text-4xl md:text-8xl font-extrabold mb-12 font-[Montserrat,Inter,sans-serif] tracking-tight text-center">
-                    QUESTIONS
-                  </h2>
-                  <div className="space-y-8">
-                    {[
-                      {
-                        id: "001",
-                        question: "How long do projects typically take?",
-                        answer:
-                          "Project timelines vary based on complexity, but most projects are completed within 2-6 weeks. We'll discuss your specific needs and set clear milestones.",
-                      },
-                      {
-                        id: "002",
-                        question: "What technologies do you specialize in?",
-                        answer:
-                          "I specialize in React, Next.js, Node.js, TypeScript, Python, and cloud platforms like AWS. I always choose the best stack for your project.",
-                      },
-                      {
-                        id: "003",
-                        question: "How do we get started?",
-                        answer:
-                          "Just reach out via email or LinkedIn! We'll schedule a call to discuss your goals, requirements, and next steps.",
-                      },
-                      {
-                        id: "004",
-                        question: "Do you offer ongoing support?",
-                        answer:
-                          "Yes, I offer maintenance and support packages to ensure your project continues to run smoothly after launch.",
-                      },
-                    ].map((faq, i) => {
-                      const [open, setOpen] = useState(false);
-                      return (
-                        <div
-                          key={faq.id}
-                          className="border-b border-gray-200 last:border-0 bg-white/80  transition-shadow hover:shadow-lg"
-                        >
-                          <button
-                            className="w-full flex items-center justify-between px-8 py-8 text-left focus:outline-none"
-                            onClick={() => setOpen((v) => !v)}
-                            aria-expanded={open}
-                            aria-controls={`faq-${faq.id}`}
-                          >
-                            <span className="flex items-center gap-8">
-                              <span className="text-gray-400 text-lg font-mono w-12">
-                                {faq.id}
-                              </span>
-                              <span
-                                className="text-2xl md:text-3xl text-black font-light"
-                                style={{
-                                  fontFamily: "var(--font-plus-jakarta)",
-                                }}
-                              >
-                                {faq.question}
-                              </span>
-                            </span>
-                            <span className="ml-4 text-black text-3xl font-thin">
-                              {open ? "−" : "+"}
-                            </span>
-                          </button>
-                          {open && (
-                            <div
-                              id={`faq-${faq.id}`}
-                              className="px-20 pb-10 text-lg text-gray-700 font-extralight"
-                              style={{ fontFamily: "var(--font-plus-jakarta)" }}
-                            >
-                              {faq.answer}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-      </section>
-      <div className="pt-20 pb-2 px-4 flex justify-center">
-        <span className="text-4xl md:text-5xl font-extrabold font-[Montserrat,Inter,sans-serif] tracking-tight text-center">
-          TECHNOLOGIES I USE
-        </span>
-      </div>
-      <div className="flex flex-wrap justify-center items-center gap-4 p-8 mb-16">
-        <img
-          width="50"
-          src="https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/firebase.png"
-          alt="Firebase"
-          title="Firebase"
-        />
-        <img
-          width="50"
-          src="https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/supabase.png"
-          alt="Supabase"
-          title="Supabase"
-        />
-        <img
-          width="50"
-          src="https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/javascript.png"
-          alt="JavaScript"
-          title="JavaScript"
-        />
-        <img
-          width="50"
-          src="https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/react.png"
-          alt="React"
-          title="React"
-        />
-        <img
-          width="50"
-          src="https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/typescript.png"
-          alt="TypeScript"
-          title="TypeScript"
-        />
-        <img
-          width="50"
-          src="https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/node_js.png"
-          alt="Node.js"
-          title="Node.js"
-        />
-        <img
-          width="50"
-          src="https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/next_js.png"
-          alt="Next.js"
-          title="Next.js"
-        />
-        <img
-          width="50"
-          src="https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/c.png"
-          alt="C"
-          title="C"
-        />
-        <img
-          width="50"
-          src="https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/python.png"
-          alt="Python"
-          title="Python"
-        />
-        <img
-          width="50"
-          src="https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/php.png"
-          alt="php"
-          title="php"
-        />
-        <img
-          width="50"
-          src="https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/go.png"
-          alt="Go"
-          title="Go"
-        />
-        <img
-          width="50"
-          src="https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/flutter.png"
-          alt="Flutter"
-          title="Flutter"
-        />
-        <img
-          width="50"
-          src="https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/postgresql.png"
-          alt="PostgreSQL"
-          title="PostgreSQL"
-        />
-        <img
-          width="50"
-          src="https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/mysql.png"
-          alt="MySQL"
-          title="MySQL"
-        />
-        <img
-          width="50"
-          src="https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/mongodb.png"
-          alt="mongoDB"
-          title="mongoDB"
-        />
-        <img
-          width="50"
-          src="https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/docker.png"
-          alt="Docker"
-          title="Docker"
-        />
-      </div>
-      {/* Contact Section */}
-      <section id="contact" className="py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <motion.h2
-            className="text-3xl md:text-5xl font-extrabold mb-8 font-[Montserrat,Inter,sans-serif] tracking-tight"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeIn}
-            custom={0.1}
-          >
-            GET IN TOUCH
-          </motion.h2>
-          <motion.p
-            className="text-xl text-gray-400 mb-8 font-extralight"
-            style={{ fontFamily: "var(--font-plus-jakarta)" }}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeIn}
-            custom={0.15}
-          >
-            Whether you have a project in mind, want to collaborate, or just
-            want to say hello, I'd love to hear from you.
-          </motion.p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={fadeIn}
-              custom={0.2}
-            >
+            <h2 className="text-4xl md:text-5xl font-bold">
+              Let's Work Together
+            </h2>
+            <p className="text-xl text-white/60 max-w-2xl">
+              Have a project in mind? Let's discuss how we can work together to
+              bring your ideas to life.
+            </p>
+            <div className="flex flex-wrap gap-4 pt-4">
               <Button
                 variant="outline"
-                className="bg-white text-black  transition-transform duration-200 hover:scale-105"
+                className="bg-white text-black hover:bg-gray-700 border-0 text-lg px-8 py-6"
                 onClick={() => window.open("mailto:hi@mrdsa.dev", "_blank")}
               >
-                Email Me
+                <Mail className="mr-2 h-5 w-5" />
+                Get in Touch
               </Button>
-            </motion.div>
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={fadeIn}
-              custom={0.25}
-            >
               <Button
                 variant="outline"
-                className="bg-black text-white border-white hover:bg-gray-900 transition-transform duration-200 hover:scale-105"
+                className="bg-black text-white border border-white/20 hover:bg-white/10 text-lg px-8 py-6"
                 onClick={() =>
                   window.open("https://linkedin.com/in/mrdsa04", "_blank")
                 }
               >
-                <Linkedin className="mr-2 h-4 w-4" />
+                <Linkedin className="mr-2 h-5 w-5" />
                 LinkedIn
               </Button>
-            </motion.div>
-          </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-4 border-t border-gray-800">
-        <motion.div
-          className="max-w-4xl mx-auto text-center text-gray-400 font-extralight"
-          style={{ fontFamily: "var(--font-plus-jakarta)" }}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeIn}
-          custom={0.1}
-        >
-          <p>&copy; 2024 Dewan Shakil Akhtar. All rights reserved. </p>
-        </motion.div>
+      <footer className="py-12 px-6 lg:px-12 border-t border-white/10">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+          <p className="text-white/40 text-sm">
+            &copy; 2024 Dewan Shakil Akhtar. All rights reserved.
+          </p>
+          <div className="flex gap-6">
+            {[
+              {
+                icon: Github,
+                url: "https://github.com/imdewan",
+                label: "GitHub",
+              },
+              {
+                icon: Linkedin,
+                url: "https://linkedin.com/in/mrdsa04",
+                label: "LinkedIn",
+              },
+              { icon: Twitter, url: "https://x.com/mrdsa04", label: "Twitter" },
+            ].map((social) => (
+              <a
+                key={social.label}
+                href={social.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white/40 hover:text-white transition-colors"
+                aria-label={social.label}
+              >
+                <social.icon size={18} />
+              </a>
+            ))}
+          </div>
+        </div>
       </footer>
     </div>
   );
