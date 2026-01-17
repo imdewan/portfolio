@@ -4,7 +4,6 @@ import {
   Linkedin,
   Twitter,
   Download,
-  ExternalLink,
   Menu,
   X,
   Youtube,
@@ -401,6 +400,29 @@ export default function Portfolio() {
               </motion.a>
             ))}
           </div>
+
+          {/* View All Projects Link */}
+          <motion.div
+            className="mt-12 flex justify-center"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeIn}
+          >
+            <Button
+              variant="outline"
+              className="bg-white text-black hover:bg-gray-700 border-0 h-12 px-8"
+              onClick={() =>
+                window.open(
+                  "https://docs.google.com/document/d/1ms3GxH6IC4JLnewuldptDgB0DVr5tQP02PAklJK742A/edit?usp=sharing",
+                  "_blank",
+                )
+              }
+            >
+              View All Projects
+              <ArrowUpRight className="ml-2 h-4 w-4" />
+            </Button>
+          </motion.div>
 
           {/* Testimonials */}
           <div className="mt-32">
