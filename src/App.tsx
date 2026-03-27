@@ -134,7 +134,7 @@ export default function Portfolio() {
                 <Button
                   variant="outline"
                   className="bg-white text-black hover:bg-gray-700 border-0 h-12 px-6"
-                  onClick={() => window.open("/resume.pdf", "_blank")}
+                  onClick={() => window.open("/new-resume.pdf", "_blank")}
                 >
                   <Download className="mr-2 h-4 w-4" />
                   Resume
