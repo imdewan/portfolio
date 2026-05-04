@@ -1,640 +1,1341 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
+  ArrowUpRight,
+  Copy,
+  Edit3,
+  Eye,
+  FileText,
   Github,
   Linkedin,
-  Twitter,
-  Download,
-  Menu,
-  X,
-  Youtube,
+  LogIn,
+  LogOut,
   Mail,
-  ArrowUpRight,
+  Menu,
+  Save,
+  Share2,
+  Terminal,
+  Trash2,
+  Twitter,
+  X,
 } from "lucide-react";
-import { Button } from "./components/ui/button";
 import { motion } from "framer-motion";
+import { Link, Route, Routes, useNavigate, useParams } from "react-router-dom";
+import {
+  onAuthStateChanged,
+  signInWithPopup,
+  signOut,
+  type User,
+} from "firebase/auth";
+import { MarkdownContent } from "./components/MarkdownContent";
+import { Seo } from "./components/Seo";
+import {
+  deletePost,
+  getAdminPosts,
+  getPostBySlug,
+  getPublishedPosts,
+  savePost,
+  slugify,
+  type BlogPost,
+  type BlogPostInput,
+  type BlogStatus,
+} from "./lib/blog";
+import { adminEmails, auth, googleProvider } from "./lib/firebase";
+import { generateAndUploadOgImage } from "./lib/ogImage";
 
-const fadeIn = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (delay = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, delay },
-  }),
+const navItems = [
+  { label: "About", href: "/#about" },
+  { label: "Blog", href: "/blog" },
+  { label: "Work", href: "/#work" },
+  { label: "Stack", href: "/#stack" },
+  { label: "Contact", href: "/#contact" },
+];
+
+const socials = [
+  { label: "GitHub", href: "https://github.com/imdewan", icon: Github },
+  {
+    label: "LinkedIn",
+    href: "https://linkedin.com/in/mrdsa04",
+    icon: Linkedin,
+  },
+  { label: "Twitter", href: "https://x.com/mrdsa04", icon: Twitter },
+];
+
+const projects = [
+  {
+    name: "Stellon Labs",
+    detail:
+      "Member of Technical Staff at a San Francisco-based YC S25 company, working across on-device AI, SDKs, and product engineering.",
+    href: "https://stellonlabs.com",
+    status: "Current | Member of Technical Staff",
+  },
+  {
+    name: "SoyFin",
+    detail:
+      "AI-powered personal finance app for tracking spending, scanning receipts, and getting cleaner budget context.",
+    href: "https://soyfin.com",
+    status: "Past | Founder",
+  },
+  {
+    name: "NOOL",
+    detail:
+      "Founding engineer work on a React Native app with a Convex backend, focused on fast product iteration.",
+    href: "https://thenool.com",
+    status: "Past | Founding Engineer",
+  },
+  {
+    name: "Ledref",
+    detail:
+      "Archived newsletter builder with drag-and-drop editing, AI helpers, and analytics.",
+    href: null,
+    status: "Archived | Founder",
+  },
+  {
+    name: "Coldpen",
+    detail:
+      "Archived cold email platform for founders and small teams. Domain retired.",
+    href: null,
+    status: "Archived | Founder",
+  },
+];
+
+const stack = [
+  {
+    name: "TypeScript",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg",
+  },
+  {
+    name: "React Native",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+  },
+  {
+    name: "React",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+  },
+  {
+    name: "Node.js",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
+  },
+  {
+    name: "Python",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
+  },
+  {
+    name: "C++",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg",
+  },
+  {
+    name: "Go",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/go/go-original.svg",
+  },
+  {
+    name: "Firebase",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/firebase/firebase-plain.svg",
+  },
+  {
+    name: "Supabase",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/supabase/supabase-original.svg",
+  },
+  {
+    name: "Docker",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
+  },
+  {
+    name: "GCP",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/googlecloud/googlecloud-original.svg",
+  },
+  {
+    name: "Convex",
+    icon: "https://media2.dev.to/dynamic/image/width=320,height=320,fit=cover,gravity=auto,format=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Forganization%2Fprofile_image%2F8065%2Fd559bbad-1732-4020-82c4-ad689dbdbc5d.png",
+  },
+];
+
+const emptyForm = {
+  title: "",
+  slug: "",
+  excerpt: "",
+  content: "# Untitled\n\nWrite your README-style Markdown here.",
+  status: "draft" as BlogStatus,
+  publishDate: new Date().toISOString().slice(0, 10),
+  tagsText: "",
+  seoTitle: "",
+  seoDescription: "",
+  ogImageUrl: "",
 };
 
-export default function Portfolio() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const toggleMenu = () => setIsMenuOpen((v) => !v);
+const aiWritingPrompt = `You are helping me draft a blog post for my personal site.
 
+My background:
+- I am Dewan Shakil Akhtar.
+- I am a Member of Technical Staff at Stellon Labs, a San Francisco-based YC S25 company.
+- I write about on-device AI, React Native SDKs, mobile/product engineering, Firebase, build logs, and honest lessons from shipping software.
+- My tone should be human, reflective, clear, and practical. Avoid generic AI hype.
+
+Topic I want to write about:
+[PASTE TOPIC / ROUGH NOTES HERE]
+
+Return the post in this exact structure:
+
+Title:
+
+Slug:
+
+Excerpt:
+
+Tags:
+
+SEO Title:
+
+SEO Description:
+
+Markdown:
+
+Requirements:
+- Write like a real person, with some feeling and memory, not corporate copy.
+- Include a strong opening.
+- Include useful technical details where relevant.
+- Include source links if claims need support.
+- Include one tasteful Markdown image near the top if it helps the post.
+- Prefer real Pixabay images, not AI-generated looking stock.
+- Keep the Markdown ready to paste into my blog admin.
+- Do not include fake personal experiences unless they are framed as examples.`;
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 12 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.35 },
+  },
+};
+
+function formatDate(date?: Date | null) {
+  if (!date) return "Draft";
+
+  return new Intl.DateTimeFormat("en", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(date);
+}
+
+function withoutDuplicateTitle(content: string, title: string) {
+  const firstHeading = new RegExp(`^#\\s+${title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*\\n+`);
+  return content.replace(firstHeading, "");
+}
+
+function SectionHeading({
+  eyebrow,
+  title,
+}: {
+  eyebrow: string;
+  title: string;
+}) {
   return (
-    <div className="bg-black text-white min-h-screen">
-      {/* Header */}
-      <motion.header
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-md border-b border-white/10"
-      >
-        <div className="container mx-auto px-6 lg:px-12 py-6 flex justify-between items-center">
-          <div
-            className="text-xl font-bold tracking-tight cursor-pointer"
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          >
-            mrDSA.dev
-          </div>
-          <nav className="hidden md:flex space-x-10">
-            {["About", "Experience", "Work", "Contact"].map((item, i) => (
-              <motion.a
-                key={item}
-                href={`#${item.toLowerCase()}`}
-                className="text-sm uppercase tracking-wider hover:text-white/60 transition-colors"
-                initial="hidden"
-                animate="visible"
-                variants={fadeIn}
-                custom={i * 0.1}
-              >
-                {item}
-              </motion.a>
-            ))}
-          </nav>
-          <button
-            className="md:hidden"
-            onClick={toggleMenu}
-            aria-label="Toggle menu"
-          >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
-        {isMenuOpen && (
-          <motion.nav
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="md:hidden bg-black border-t border-white/10"
-          >
-            <div className="container mx-auto px-6 py-6 flex flex-col space-y-4">
-              {["About", "Experience", "Work", "Contact"].map((item) => (
-                <a
-                  key={item}
-                  href={`#${item.toLowerCase()}`}
-                  className="text-sm uppercase tracking-wider hover:text-white/60 transition-colors"
-                  onClick={toggleMenu}
-                >
-                  {item}
-                </a>
-              ))}
-            </div>
-          </motion.nav>
-        )}
-      </motion.header>
-
-      {/* Hero Section */}
-      <section className="min-h-screen flex items-center justify-center px-6 lg:px-12 pt-24 pb-12">
-        <div className="max-w-7xl w-full">
-          <div className="grid lg:grid-cols-[1.2fr,1fr] gap-16 items-center">
-            {/* Left - Text Content */}
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={fadeIn}
-              className="space-y-10 order-2 lg:order-1"
-            >
-              <div className="space-y-6">
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.6 }}
-                >
-                  <p className="text-sm uppercase tracking-widest text-white/80 mb-4">
-                    Full Stack Developer & Founder
-                  </p>
-                  <h1 className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight leading-[1.1]">
-                    Dewan Shakil
-                    <br />
-                    Akhtar
-                  </h1>
-                </motion.div>
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                  className="text-lg md:text-xl text-white/60 leading-relaxed max-w-xl"
-                >
-                  Building scalable applications and digital products that solve
-                  real problems. Specialized in modern web technologies and
-                  startup development.
-                </motion.p>
-              </div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                className="flex flex-wrap gap-4"
-              >
-                <Button
-                  variant="outline"
-                  className="bg-white text-black hover:bg-gray-700 border-0 h-12 px-6"
-                  onClick={() => window.open("/new-resume.pdf", "_blank")}
-                >
-                  <Download className="mr-2 h-4 w-4" />
-                  Resume
-                </Button>
-                <Button
-                  variant="outline"
-                  className="bg-black text-white border-2 border-white/20 hover:bg-white/10 h-12 px-6"
-                  onClick={() => window.open("mailto:hi@mrdsa.dev", "_blank")}
-                >
-                  <Mail className="mr-2 h-4 w-4" />
-                  hi@mrdsa.dev
-                </Button>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="flex items-center gap-6 pt-2"
-              >
-                <span className="text-xs uppercase tracking-widest text-white/30">
-                  Connect
-                </span>
-                <div className="flex gap-5">
-                  {[
-                    {
-                      icon: Github,
-                      url: "https://github.com/imdewan",
-                      label: "GitHub",
-                    },
-                    {
-                      icon: Linkedin,
-                      url: "https://linkedin.com/in/mrdsa04",
-                      label: "LinkedIn",
-                    },
-                    {
-                      icon: Twitter,
-                      url: "https://x.com/mrdsa04",
-                      label: "Twitter",
-                    },
-                    {
-                      icon: Youtube,
-                      url: "https://youtube.com/@dewanshakilyt",
-                      label: "YouTube",
-                    },
-                  ].map((social) => (
-                    <motion.a
-                      key={social.label}
-                      href={social.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-white/40 hover:text-white transition-colors"
-                      whileHover={{ scale: 1.15, y: -2 }}
-                      aria-label={social.label}
-                    >
-                      <social.icon size={22} />
-                    </motion.a>
-                  ))}
-                </div>
-              </motion.div>
-            </motion.div>
-
-            {/* Right - Profile Image */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.2 }}
-              className="flex justify-center lg:justify-end order-1 lg:order-2"
-            >
-              <div className="relative group">
-                {/* Decorative border effect */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-white/20 to-white/5 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-500"></div>
-                <div className="relative w-64 h-80 md:w-80 md:h-[500px] lg:w-96 lg:h-[550px] rounded-3xl overflow-hidden border border-white/20 bg-gradient-to-br from-white/5 to-transparent">
-                  <img
-                    src="/me-portrait.webp"
-                    alt="Dewan Shakil Akhtar"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700"
-                  />
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* About Section */}
-      <section
-        id="about"
-        className="py-32 px-6 lg:px-12 border-t border-white/10"
-      >
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeIn}
-            className="grid md:grid-cols-2 gap-16"
-          >
-            <div>
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">About</h2>
-              <div className="w-16 h-1 bg-white mb-8" />
-            </div>
-            <div className="space-y-6 text-lg text-white/70 leading-relaxed">
-              <p>
-                With years of experience in full-stack development, I specialize
-                in building modern web & mobile applications that scale. My
-                focus is on creating clean, efficient solutions that solve real
-                problems.
-              </p>
-              <p>
-                I've founded multiple successful startups and worked with
-                clients across the globe, delivering high-quality products that
-                drive results and user engagement.
-              </p>
-              <div className="pt-6">
-                <p className="text-white font-semibold text-2xl">Since 2020</p>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Experience Section */}
-      <section
-        id="experience"
-        className="py-32 px-6 lg:px-12 border-t border-white/10"
-      >
-        <div className="max-w-6xl mx-auto">
-          <motion.h2
-            className="text-4xl md:text-5xl font-bold mb-16"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeIn}
-          >
-            Experience
-          </motion.h2>
-          <div className="space-y-2">
-            {[
-              {
-                company: "NOOL",
-                role: "Founding Engineer",
-                desc: "React Native app with Convex backend",
-                url: "https://thenool.com",
-              },
-              {
-                company: "Ledref",
-                role: "Founder & Full Stack Developer",
-                desc: "Newsletter Platform",
-                url: "https://ledref.com",
-              },
-              {
-                company: "ColdPen",
-                role: "Founder & Full Stack Developer",
-                desc: "Cold Email Platform",
-                url: "https://coldpen.io",
-              },
-              {
-                company: "Freelance",
-                role: "Full Stack Developer",
-                desc: "Various client projects",
-                url: null,
-              },
-            ].map((exp, i) => (
-              <motion.div
-                key={exp.company}
-                className="group py-8 border-b border-white/10 last:border-0"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fadeIn}
-                custom={i * 0.1}
-              >
-                <div className="grid md:grid-cols-3 gap-6 items-start">
-                  <div>
-                    {exp.url ? (
-                      <a
-                        href={exp.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-2xl font-bold hover:text-white/60 transition-colors inline-flex items-center gap-2"
-                      >
-                        {exp.company}
-                        <ArrowUpRight
-                          size={20}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity"
-                        />
-                      </a>
-                    ) : (
-                      <h3 className="text-2xl font-bold">{exp.company}</h3>
-                    )}
-                  </div>
-                  <div className="text-white/60">{exp.role}</div>
-                  <div className="text-white/40 text-sm md:text-right">
-                    {exp.desc}
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Work/Projects Section */}
-      <section
-        id="work"
-        className="py-32 px-6 lg:px-12 border-t border-white/10"
-      >
-        <div className="max-w-6xl mx-auto">
-          <motion.h2
-            className="text-4xl md:text-5xl font-bold mb-16"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeIn}
-          >
-            Selected Work
-          </motion.h2>
-          <div className="grid md:grid-cols-2 gap-12">
-            {[
-              {
-                title: "Ledref",
-                desc: "Newsletter platform with drag-and-drop editor, AI tools, and analytics.",
-                url: "https://ledref.com",
-                img: "/images/ledref-screenshot.jpeg",
-              },
-              {
-                title: "ColdPen",
-                desc: "Simple cold email platform for founders who want results.",
-                url: "https://coldpen.io",
-                img: "/images/coldpen-screenshot.png",
-              },
-            ].map((project, i) => (
-              <motion.a
-                key={project.title}
-                href={project.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group block space-y-6"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fadeIn}
-                custom={i * 0.1}
-              >
-                <div className="aspect-video bg-white/5 rounded-lg overflow-hidden border border-white/10">
-                  <img
-                    src={project.img}
-                    alt={project.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold mb-2 group-hover:text-white/60 transition-colors flex items-center gap-2">
-                    {project.title}
-                    <ArrowUpRight
-                      size={20}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity"
-                    />
-                  </h3>
-                  <p className="text-white/60">{project.desc}</p>
-                </div>
-              </motion.a>
-            ))}
-          </div>
-
-          {/* View All Projects Link */}
-          <motion.div
-            className="mt-12 flex justify-center"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeIn}
-          >
-            <Button
-              variant="outline"
-              className="bg-white text-black hover:bg-gray-700 border-0 h-12 px-8"
-              onClick={() =>
-                window.open(
-                  "https://docs.google.com/document/d/1ms3GxH6IC4JLnewuldptDgB0DVr5tQP02PAklJK742A/edit?usp=sharing",
-                  "_blank",
-                )
-              }
-            >
-              View All Projects
-              <ArrowUpRight className="ml-2 h-4 w-4" />
-            </Button>
-          </motion.div>
-
-          {/* Testimonials */}
-          <div className="mt-32">
-            <h3 className="text-3xl font-bold mb-12">Testimonials</h3>
-            <div className="grid md:grid-cols-2 gap-8">
-              {[
-                {
-                  quote:
-                    "Kind, polite, and a truly good freelancer. Dewan was always available for questions, responded quickly, and delivered exactly what I needed.",
-                  name: "Ahmet Fuat Y.",
-                  company: "Founder of Solar Curtain",
-                },
-                {
-                  quote:
-                    "Dewan did well in removing all the bugs from my code and is available 24/7 to respond to enquiries. He is a very good developer.",
-                  name: "Abhi Patel",
-                  company: "Client",
-                },
-              ].map((testimonial, i) => (
-                <motion.div
-                  key={testimonial.name}
-                  className="p-8 border border-white/10 rounded-lg"
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                  variants={fadeIn}
-                  custom={i * 0.1}
-                >
-                  <p className="text-white/70 mb-6 italic">
-                    "{testimonial.quote}"
-                  </p>
-                  <div>
-                    <p className="font-semibold">{testimonial.name}</p>
-                    <p className="text-white/40 text-sm">
-                      {testimonial.company}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-
-          {/* Tech Stack */}
-          <div className="mt-32">
-            <h3 className="text-3xl font-bold mb-12">Technologies</h3>
-            <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-8 gap-8">
-              {[
-                {
-                  name: "Firebase",
-                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/firebase.png",
-                },
-                {
-                  name: "Supabase",
-                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/supabase.png",
-                },
-                {
-                  name: "JavaScript",
-                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/javascript.png",
-                },
-                {
-                  name: "React",
-                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/react.png",
-                },
-                {
-                  name: "TypeScript",
-                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/typescript.png",
-                },
-                {
-                  name: "Node.js",
-                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/node_js.png",
-                },
-                {
-                  name: "Next.js",
-                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/next_js.png",
-                },
-                {
-                  name: "Expo",
-                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/expo.png",
-                },
-                {
-                  name: "Python",
-                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/python.png",
-                },
-                {
-                  name: "PHP",
-                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/php.png",
-                },
-                {
-                  name: "Go",
-                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/go.png",
-                },
-                {
-                  name: "Flutter",
-                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/flutter.png",
-                },
-                {
-                  name: "PostgreSQL",
-                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/postgresql.png",
-                },
-                {
-                  name: "MySQL",
-                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/mysql.png",
-                },
-                {
-                  name: "Arduino",
-                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/arduino.png",
-                },
-                {
-                  name: "Docker",
-                  icon: "https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/docker.png",
-                },
-              ].map((tech, i) => (
-                <motion.div
-                  key={tech.name}
-                  className="flex flex-col items-center gap-3 opacity-60 hover:opacity-100 transition-opacity"
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                  variants={fadeIn}
-                  custom={i * 0.05}
-                >
-                  <img
-                    src={tech.icon}
-                    alt={tech.name}
-                    className={`w-12 h-12 ${tech.name === "Expo" ? "bg-white rounded-lg p-2" : ""}`}
-                  />
-                  <span className="text-xs text-white/60">{tech.name}</span>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Contact Section */}
-      <section
-        id="contact"
-        className="py-32 px-6 lg:px-12 border-t border-white/10"
-      >
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeIn}
-            className="space-y-8"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold">
-              Let's Work Together
-            </h2>
-            <p className="text-xl text-white/60 max-w-2xl">
-              Have a project in mind? Let's discuss how we can work together to
-              bring your ideas to life.
-            </p>
-            <div className="flex flex-wrap gap-4 pt-4">
-              <Button
-                variant="outline"
-                className="bg-white text-black hover:bg-gray-700 border-0 text-lg px-8 py-6"
-                onClick={() => window.open("mailto:hi@mrdsa.dev", "_blank")}
-              >
-                <Mail className="mr-2 h-5 w-5" />
-                Get in Touch
-              </Button>
-              <Button
-                variant="outline"
-                className="bg-black text-white border border-white/20 hover:bg-white/10 text-lg px-8 py-6"
-                onClick={() =>
-                  window.open("https://linkedin.com/in/mrdsa04", "_blank")
-                }
-              >
-                <Linkedin className="mr-2 h-5 w-5" />
-                LinkedIn
-              </Button>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-12 px-6 lg:px-12 border-t border-white/10">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-white/40 text-sm">
-            &copy; 2024 Dewan Shakil Akhtar. All rights reserved.
-          </p>
-          <div className="flex gap-6">
-            {[
-              {
-                icon: Github,
-                url: "https://github.com/imdewan",
-                label: "GitHub",
-              },
-              {
-                icon: Linkedin,
-                url: "https://linkedin.com/in/mrdsa04",
-                label: "LinkedIn",
-              },
-              { icon: Twitter, url: "https://x.com/mrdsa04", label: "Twitter" },
-            ].map((social) => (
-              <a
-                key={social.label}
-                href={social.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white/40 hover:text-white transition-colors"
-                aria-label={social.label}
-              >
-                <social.icon size={18} />
-              </a>
-            ))}
-          </div>
-        </div>
-      </footer>
+    <div className="mb-8">
+      <p className="mb-2 font-mono text-xs uppercase tracking-[0.2em] text-emerald-400">
+        {eyebrow}
+      </p>
+      <h2 className="text-2xl font-semibold tracking-tight text-zinc-50">
+        {title}
+      </h2>
     </div>
   );
 }
+
+function Header() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  return (
+    <header className="border-b border-white/10">
+      <div className="mx-auto flex max-w-3xl items-center justify-between px-5 py-6">
+        <Link to="/" className="font-mono text-sm text-zinc-100">
+          Dewan Shakil Akhtar
+        </Link>
+
+        <nav className="hidden items-center gap-6 md:flex" aria-label="Main">
+          {navItems.map((item) => (
+            <a
+              key={item.label}
+              href={item.href}
+              className="font-mono text-sm text-zinc-400 transition-colors hover:text-zinc-100"
+            >
+              {item.label}
+            </a>
+          ))}
+        </nav>
+
+        <button
+          className="grid h-9 w-9 place-items-center rounded-md border border-white/10 text-zinc-300 md:hidden"
+          onClick={() => setIsMenuOpen((value) => !value)}
+          aria-label="Toggle menu"
+        >
+          {isMenuOpen ? (
+            <X className="h-4 w-4" />
+          ) : (
+            <Menu className="h-4 w-4" />
+          )}
+        </button>
+      </div>
+
+      {isMenuOpen ? (
+        <nav className="mx-auto flex max-w-3xl flex-col gap-3 border-t border-white/10 px-5 py-4 md:hidden">
+          {navItems.map((item) => (
+            <a
+              key={item.label}
+              href={item.href}
+              className="font-mono text-sm text-zinc-300"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              {item.label}
+            </a>
+          ))}
+        </nav>
+      ) : null}
+    </header>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="mx-auto flex max-w-3xl items-center justify-between border-t border-white/10 px-5 py-8 text-sm text-zinc-500">
+      <span>© Dewan Shakil Akhtar</span>
+      <div className="flex gap-4">
+        {socials.map((social) => (
+          <a
+            key={social.label}
+            href={social.href}
+            target="_blank"
+            rel="noreferrer"
+            className="hover:text-zinc-200"
+          >
+            {social.label}
+          </a>
+        ))}
+      </div>
+    </footer>
+  );
+}
+
+function usePublishedPosts() {
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let ignore = false;
+
+    getPublishedPosts()
+      .then((items) => {
+        if (!ignore) setPosts(items);
+      })
+      .catch((reason) => {
+        if (!ignore) {
+          setError(
+            reason instanceof Error
+              ? reason.message
+              : "Could not load posts from Firestore.",
+          );
+        }
+      })
+      .finally(() => {
+        if (!ignore) setIsLoading(false);
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  return { posts, isLoading, error };
+}
+
+function BlogList({
+  posts,
+  compact = false,
+}: {
+  posts: BlogPost[];
+  compact?: boolean;
+}) {
+  return (
+    <div className="space-y-8">
+      {posts.map((post) => (
+        <article key={post.slug} className="group">
+          <Link to={`/blog/${post.slug}`} className="block">
+            <h3 className="text-xl font-semibold tracking-tight text-zinc-50 transition-colors group-hover:text-emerald-300">
+              {post.title}
+            </h3>
+            <p className="mt-2 font-mono text-xs text-zinc-500">
+              {formatDate(post.publishedAt)} · {post.readingMinutes} min
+              {post.tags[0] ? ` · ${post.tags[0]}` : ""}
+            </p>
+            <p className="mt-3 leading-7 text-zinc-400">{post.excerpt}</p>
+          </Link>
+        </article>
+      ))}
+      {compact ? (
+        <Link
+          to="/blog"
+          className="inline-flex items-center gap-2 font-mono text-sm text-emerald-400 hover:text-emerald-300"
+        >
+          All posts <ArrowUpRight className="h-4 w-4" />
+        </Link>
+      ) : null}
+    </div>
+  );
+}
+
+function HomePage() {
+  const { posts, error } = usePublishedPosts();
+
+  useEffect(() => {
+    if (!window.location.hash) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      document.querySelector(window.location.hash)?.scrollIntoView();
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
+
+  return (
+    <>
+      <Seo
+        title="Dewan Shakil Akhtar | Builder, Engineer, Notes"
+        description="Personal site and blog for Dewan Shakil Akhtar, a full-stack builder working on on-device AI, React Native SDKs, and product engineering."
+      />
+      <main className="mx-auto max-w-3xl px-5">
+        <motion.section
+          id="about"
+          className="grid gap-8 py-16 sm:grid-cols-[132px_1fr] sm:py-20"
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+        >
+          <img
+            src="/avatar.jpeg"
+            alt="Dewan Shakil Akhtar"
+            className="h-32 w-32 rounded-2xl object-cover"
+          />
+
+          <div>
+            <div className="mb-4 inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/[0.03] px-3 py-2 font-mono text-xs text-emerald-400">
+              <Terminal className="h-3.5 w-3.5" />
+              <span>mrdsa04 / full-stack builder</span>
+            </div>
+
+            <h1 className="text-3xl font-semibold leading-tight tracking-tight text-zinc-50 sm:text-4xl">
+              Hey, I&apos;m Dewan.
+            </h1>
+            <p className="mt-4 text-lg leading-8 text-zinc-300">
+              I&apos;m a Member of Technical Staff at Stellon Labs, a San
+              Francisco-based YC S25 company, working on on-device AI and SDKs,
+              and full-stack product engineering. I write about what I&apos;m
+              building and the tradeoffs behind it.
+            </p>
+
+            <div className="mt-6 flex flex-wrap gap-4">
+              {socials.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 text-sm text-zinc-400 transition-colors hover:text-zinc-100"
+                >
+                  <social.icon className="h-4 w-4" />
+                  {social.label}
+                </a>
+              ))}
+            </div>
+          </div>
+        </motion.section>
+
+        <section id="blog" className="border-t border-white/10 py-14">
+          <SectionHeading
+            eyebrow="Recent posts"
+            title="Writing, notes, and build logs."
+          />
+          {error ? (
+            <p className="font-mono text-sm text-red-300">{error}</p>
+          ) : posts.length > 0 ? (
+            <BlogList posts={posts.slice(0, 3)} compact />
+          ) : (
+            <p className="leading-7 text-zinc-500">
+              No published posts yet.
+            </p>
+          )}
+        </section>
+
+        <section id="work" className="border-t border-white/10 py-14">
+          <SectionHeading
+            eyebrow="Work"
+            title="Roles, builds, and archived projects."
+          />
+
+          <div className="divide-y divide-white/10">
+            {projects.map((project) => (
+              <article key={project.name} className="py-5 first:pt-0 last:pb-0">
+                <div className="flex items-start justify-between gap-5">
+                  <div>
+                    <div className="mb-2 flex items-center gap-3">
+                      <h3 className="text-lg font-semibold text-zinc-50">
+                        {project.name}
+                      </h3>
+                      <span className="rounded-full border border-white/10 px-2 py-0.5 font-mono text-[11px] text-zinc-500">
+                        {project.status}
+                      </span>
+                    </div>
+                    <p className="leading-7 text-zinc-400">{project.detail}</p>
+                  </div>
+
+                  {project.href ? (
+                    <a
+                      href={project.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={`Open ${project.name}`}
+                      className="mt-1 shrink-0 text-zinc-500 transition-colors hover:text-zinc-100"
+                    >
+                      <ArrowUpRight className="h-5 w-5" />
+                    </a>
+                  ) : null}
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section id="stack" className="border-t border-white/10 py-14">
+          <SectionHeading eyebrow="Stack" title="The tools I reach for." />
+
+          <div className="flex flex-wrap gap-2">
+            {stack.map((item) => (
+              <span
+                key={item.name}
+                className="inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/[0.03] px-3 py-2 font-mono text-sm text-zinc-300"
+              >
+                <img src={item.icon} alt="" className="h-4 w-4 rounded-sm" />
+                {item.name}
+              </span>
+            ))}
+          </div>
+        </section>
+
+        <section id="contact" className="border-t border-white/10 py-14">
+          <SectionHeading eyebrow="Contact" title="Need to reach me?" />
+
+          <p className="max-w-2xl leading-8 text-zinc-400">
+            If you want to say hi, ask about something I&apos;ve built, or need
+            help with React Native, AI SDKs, or product engineering, you can
+            reach me here.
+          </p>
+
+          <a
+            href="mailto:hi@mrdsa.dev"
+            className="mt-6 inline-flex h-10 items-center gap-2 rounded-md bg-zinc-100 px-4 text-sm font-medium text-zinc-950 transition-colors hover:bg-white"
+          >
+            <Mail className="h-4 w-4" />
+            hi@mrdsa.dev
+          </a>
+        </section>
+      </main>
+    </>
+  );
+}
+
+function BlogIndexPage() {
+  const { posts, isLoading, error } = usePublishedPosts();
+
+  return (
+    <main className="mx-auto max-w-3xl px-5 py-16">
+      <Seo
+        title="Blog"
+        description="Writing, notes, and build logs by Dewan Shakil Akhtar."
+        canonicalPath="/blog"
+      />
+      <SectionHeading eyebrow="Blog" title="Writing, notes, and build logs." />
+      {isLoading ? (
+        <p className="font-mono text-sm text-zinc-500">Loading posts...</p>
+      ) : error ? (
+        <p className="font-mono text-sm text-red-300">{error}</p>
+      ) : posts.length > 0 ? (
+        <BlogList posts={posts} />
+      ) : (
+        <p className="leading-7 text-zinc-500">No published posts yet.</p>
+      )}
+    </main>
+  );
+}
+
+function BlogPostPage() {
+  const { slug = "" } = useParams();
+  const [post, setPost] = useState<BlogPost | null | undefined>(undefined);
+  const [copyMessage, setCopyMessage] = useState("");
+
+  useEffect(() => {
+    let ignore = false;
+
+    getPostBySlug(slug)
+      .then((item) => {
+        if (ignore) return;
+        setPost(item?.status === "published" ? item : null);
+      })
+      .catch(() => {
+        if (!ignore) setPost(null);
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [slug]);
+
+  if (post === undefined) {
+    return (
+      <main className="mx-auto max-w-3xl px-5 py-16">
+        <p className="font-mono text-sm text-zinc-500">Loading post...</p>
+      </main>
+    );
+  }
+
+  if (!post) {
+    return (
+      <main className="mx-auto max-w-3xl px-5 py-16">
+        <Seo
+          title="Post not found"
+          description="This blog post could not be found."
+          canonicalPath={`/blog/${slug}`}
+        />
+        <SectionHeading eyebrow="404" title="Post not found." />
+        <Link to="/blog" className="font-mono text-sm text-emerald-400">
+          Back to blog
+        </Link>
+      </main>
+    );
+  }
+
+  const description = post.seoDescription || post.excerpt;
+  const title = post.seoTitle || post.title;
+  const postUrl = `${window.location.origin}/blog/${post.slug}`;
+  const ogImage = post.ogImageUrl || "https://mrdsa.dev/og-profile.png";
+
+  async function copyPostLink() {
+    await navigator.clipboard.writeText(postUrl);
+    setCopyMessage("Copied");
+    window.setTimeout(() => setCopyMessage(""), 1600);
+  }
+
+  async function sharePost() {
+    if (navigator.share) {
+      await navigator.share({
+        title: post.title,
+        text: post.excerpt,
+        url: postUrl,
+      });
+      return;
+    }
+
+    await copyPostLink();
+  }
+
+  return (
+    <main className="mx-auto max-w-3xl px-5 py-16">
+      <Seo
+        title={title}
+        description={description}
+        canonicalPath={`/blog/${post.slug}`}
+        type="article"
+        image={ogImage}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          headline: post.title,
+          description,
+          image: ogImage,
+          datePublished: post.publishedAt?.toISOString(),
+          dateModified: post.updatedAt?.toISOString(),
+          author: {
+            "@type": "Person",
+            name: "Dewan Shakil Akhtar",
+            url: "https://mrdsa.dev",
+          },
+          mainEntityOfPage: `https://mrdsa.dev/blog/${post.slug}`,
+        }}
+      />
+      <article>
+        <div className="flex items-center justify-between gap-4">
+          <Link to="/blog" className="font-mono text-sm text-emerald-400">
+            Back to blog
+          </Link>
+          <div className="flex items-center gap-2">
+            <button
+              className="inline-flex h-8 items-center gap-1.5 rounded-md px-2 text-xs text-zinc-500 transition-colors hover:bg-white/[0.04] hover:text-zinc-300"
+              onClick={sharePost}
+            >
+              <Share2 className="h-3.5 w-3.5" />
+              Share
+            </button>
+            <button
+              className="inline-flex h-8 items-center gap-1.5 rounded-md px-2 text-xs text-zinc-500 transition-colors hover:bg-white/[0.04] hover:text-zinc-300"
+              onClick={copyPostLink}
+            >
+              <Copy className="h-3.5 w-3.5" />
+              Copy
+            </button>
+            {copyMessage ? (
+              <span className="font-mono text-xs text-emerald-500">
+                {copyMessage}
+              </span>
+            ) : null}
+          </div>
+        </div>
+        <header className="mb-10 mt-8">
+          <h1 className="text-4xl font-semibold tracking-tight text-zinc-50">
+            {post.title}
+          </h1>
+          <p className="mt-3 font-mono text-xs text-zinc-500">
+            {formatDate(post.publishedAt)} · {post.readingMinutes} min
+            {post.tags.length ? ` · ${post.tags.join(", ")}` : ""}
+          </p>
+          <p className="mt-5 text-lg leading-8 text-zinc-400">{post.excerpt}</p>
+        </header>
+        <MarkdownContent content={withoutDuplicateTitle(post.content, post.title)} />
+      </article>
+    </main>
+  );
+}
+
+function useAuthUser() {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    return onAuthStateChanged(auth, (nextUser) => {
+      setUser(nextUser);
+      setIsLoading(false);
+    });
+  }, []);
+
+  return { user, isLoading };
+}
+
+function AdminPage() {
+  const navigate = useNavigate();
+  const { user, isLoading } = useAuthUser();
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [editingId, setEditingId] = useState<string | undefined>();
+  const [form, setForm] = useState(emptyForm);
+  const [message, setMessage] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+
+  const allowed = useMemo(() => {
+    return Boolean(
+      user?.email && adminEmails.includes(user.email.toLowerCase()),
+    );
+  }, [user]);
+
+  function loadPosts() {
+    if (!allowed) return;
+    getAdminPosts()
+      .then(setPosts)
+      .catch(() => setMessage("Could not load posts."));
+  }
+
+  useEffect(loadPosts, [allowed]);
+
+  function updateField(field: keyof typeof emptyForm, value: string) {
+    setForm((current) => ({
+      ...current,
+      [field]: value,
+      slug:
+        field === "title" && !current.slug
+          ? slugify(value)
+          : field === "slug"
+            ? slugify(value)
+            : current.slug,
+    }));
+  }
+
+  function editPost(post: BlogPost) {
+    setEditingId(post.id);
+    setForm({
+      title: post.title,
+      slug: post.slug,
+      excerpt: post.excerpt,
+      content: post.content,
+      status: post.status,
+      publishDate:
+        post.publishedAt?.toISOString().slice(0, 10) ??
+        new Date().toISOString().slice(0, 10),
+      tagsText: post.tags.join(", "),
+      seoTitle: post.seoTitle ?? "",
+      seoDescription: post.seoDescription ?? "",
+      ogImageUrl: post.ogImageUrl ?? "",
+    });
+  }
+
+  function getFormTags() {
+    return form.tagsText
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter(Boolean);
+  }
+
+  async function createPreviewImage(slug: string, tags: string[]) {
+    return generateAndUploadOgImage({
+      title: form.title.trim() || "Untitled post",
+      slug,
+      tags,
+      date: form.publishDate
+        ? formatDate(new Date(`${form.publishDate}T12:00:00`))
+        : undefined,
+    });
+  }
+
+  async function handleGeneratePreviewImage() {
+    const slug = slugify(form.slug || form.title);
+    if (!slug) {
+      setMessage("Add a title before generating a preview image.");
+      return;
+    }
+
+    setIsGeneratingImage(true);
+    setMessage("Generating preview image...");
+
+    try {
+      const imageUrl = await createPreviewImage(slug, getFormTags());
+      setForm((current) => ({
+        ...current,
+        slug,
+        ogImageUrl: imageUrl,
+      }));
+      setMessage("Preview image generated.");
+    } catch {
+      setMessage("Preview image failed. Check Firebase Storage rules.");
+    } finally {
+      setIsGeneratingImage(false);
+    }
+  }
+
+  async function handleSave() {
+    setIsSaving(true);
+    setMessage("");
+
+    const slug = slugify(form.slug || form.title);
+    const tags = getFormTags();
+    let ogImageUrl = form.ogImageUrl.trim();
+
+    try {
+      if (!ogImageUrl && slug) {
+        setMessage("Generating preview image...");
+        ogImageUrl = await createPreviewImage(slug, tags);
+        setForm((current) => ({
+          ...current,
+          slug,
+          ogImageUrl,
+        }));
+      }
+
+      const payload: BlogPostInput = {
+      title: form.title.trim(),
+      slug,
+      excerpt: form.excerpt.trim(),
+      content: form.content,
+      status: form.status,
+      publishedAt: form.publishDate ? new Date(`${form.publishDate}T12:00:00`) : null,
+      tags,
+      seoTitle: form.seoTitle.trim() || undefined,
+      seoDescription: form.seoDescription.trim() || undefined,
+      ogImageUrl: ogImageUrl || undefined,
+    };
+
+      const id = await savePost(payload, editingId);
+      setEditingId(id);
+      setMessage("Saved.");
+      loadPosts();
+    } catch {
+      setMessage("Save failed. Check Firebase Auth and Firestore rules.");
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  async function handleDelete(id: string) {
+    if (!window.confirm("Delete this post?")) return;
+    await deletePost(id);
+    if (editingId === id) {
+      setEditingId(undefined);
+      setForm(emptyForm);
+    }
+    loadPosts();
+  }
+
+  async function copyPrompt() {
+    await navigator.clipboard.writeText(aiWritingPrompt);
+    setMessage("Prompt copied.");
+  }
+
+  if (isLoading) {
+    return (
+      <main className="mx-auto max-w-5xl px-5 py-16">
+        <p className="font-mono text-sm text-zinc-500">Checking auth...</p>
+      </main>
+    );
+  }
+
+  if (!user) {
+    return (
+      <main className="mx-auto max-w-3xl px-5 py-16">
+        <Seo
+          title="Admin"
+          description="Private blog editor for Dewan Shakil Akhtar."
+          canonicalPath="/admin"
+        />
+        <SectionHeading eyebrow="Admin" title="Sign in to write." />
+        <button
+          className="inline-flex h-10 items-center gap-2 rounded-md bg-zinc-100 px-4 text-sm font-medium text-zinc-950 hover:bg-white"
+          onClick={() => signInWithPopup(auth, googleProvider)}
+        >
+          <LogIn className="h-4 w-4" />
+          Sign in with Google
+        </button>
+      </main>
+    );
+  }
+
+  if (!allowed) {
+    return (
+      <main className="mx-auto max-w-3xl px-5 py-16">
+        <SectionHeading eyebrow="Admin" title="Access not configured." />
+        <p className="leading-7 text-zinc-400">
+          Signed in as {user.email}. This admin is restricted to
+          <code className="mx-2 rounded bg-white/10 px-2 py-1 font-mono text-sm">
+            mydsaproduction@gmail.com
+          </code>
+          .
+        </p>
+        <button
+          className="mt-6 inline-flex h-10 items-center gap-2 rounded-md border border-white/10 px-4 text-sm text-zinc-200 hover:bg-white/[0.05]"
+          onClick={() => signOut(auth)}
+        >
+          <LogOut className="h-4 w-4" />
+          Sign out
+        </button>
+      </main>
+    );
+  }
+
+  return (
+    <main className="mx-auto max-w-7xl px-5 py-10">
+      <Seo
+        title="Admin"
+        description="Private blog editor for Dewan Shakil Akhtar."
+        canonicalPath="/admin"
+      />
+      <div className="mb-8 flex flex-col justify-between gap-5 border-b border-white/10 pb-6 md:flex-row md:items-end">
+        <div>
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-emerald-400">
+            Admin
+          </p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-50">
+            Write and publish.
+          </h1>
+          <p className="mt-3 max-w-2xl text-zinc-400">
+            Draft in Markdown, keep SEO fields close, and preview the post like
+            it will actually read on the site.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <button
+            className="inline-flex h-10 items-center gap-2 rounded-md bg-zinc-100 px-4 text-sm font-medium text-zinc-950 hover:bg-white"
+            onClick={() => {
+              setEditingId(undefined);
+              setForm(emptyForm);
+            }}
+          >
+            <FileText className="h-4 w-4" />
+            New post
+          </button>
+          <button
+            className="inline-flex h-10 items-center gap-2 rounded-md border border-white/10 px-4 text-sm text-zinc-200 hover:bg-white/[0.05]"
+            onClick={() => signOut(auth)}
+          >
+            <LogOut className="h-4 w-4" />
+            Sign out
+          </button>
+        </div>
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-[300px_1fr]">
+        <aside className="space-y-4">
+          <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-sm font-medium text-zinc-100">Posts</h2>
+              <span className="font-mono text-xs text-zinc-500">
+                {posts.length}
+              </span>
+            </div>
+            <div className="space-y-3">
+              {posts.length === 0 ? (
+                <p className="text-sm leading-6 text-zinc-500">
+                  No posts yet. Start with a new draft.
+                </p>
+              ) : null}
+              {posts.map((post) => (
+                <div
+                  key={post.id}
+                  className={`rounded-xl border p-3 ${
+                    editingId === post.id
+                      ? "border-emerald-400/50 bg-emerald-400/5"
+                      : "border-white/10 bg-black/10"
+                  }`}
+                >
+                  <p className="line-clamp-2 font-medium text-zinc-100">
+                    {post.title}
+                  </p>
+                  <p className="mt-1 line-clamp-1 font-mono text-xs text-zinc-500">
+                    {post.status} · {post.slug}
+                  </p>
+                  <div className="mt-3 flex gap-2">
+                    <button
+                      className="inline-flex h-8 items-center gap-2 rounded-md border border-white/10 px-3 text-xs text-zinc-300 hover:bg-white/[0.05]"
+                      onClick={() => editPost(post)}
+                    >
+                      <Edit3 className="h-3.5 w-3.5" />
+                      Edit
+                    </button>
+                    {post.id ? (
+                      <button
+                        className="inline-flex h-8 items-center gap-2 rounded-md border border-red-400/20 px-3 text-xs text-red-300 hover:bg-red-400/10"
+                        onClick={() => handleDelete(post.id!)}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <div>
+                <h2 className="text-sm font-medium text-zinc-100">
+                  AI draft prompt
+                </h2>
+                <p className="mt-1 text-xs leading-5 text-zinc-500">
+                  Copy this, add your topic, paste the result back into fields.
+                </p>
+              </div>
+              <button
+                className="inline-flex h-8 items-center gap-2 rounded-md border border-white/10 px-3 text-xs text-zinc-300 hover:bg-white/[0.05]"
+                onClick={copyPrompt}
+              >
+                <Copy className="h-3.5 w-3.5" />
+                Copy
+              </button>
+            </div>
+            <pre className="max-h-72 overflow-auto whitespace-pre-wrap rounded-xl border border-white/10 bg-black/20 p-3 font-mono text-[11px] leading-5 text-zinc-500">
+              {aiWritingPrompt}
+            </pre>
+          </section>
+        </aside>
+
+        <section className="grid gap-6">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+            <div className="mb-5 flex items-center justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-semibold text-zinc-50">
+                  Post details
+                </h2>
+                <p className="mt-1 text-sm text-zinc-500">
+                  These fields power the card, URL, SEO, and article header.
+                </p>
+              </div>
+              <span className="rounded-full border border-white/10 px-3 py-1 font-mono text-xs text-zinc-500">
+                {form.status}
+              </span>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <label className="grid gap-2">
+                <span className="font-mono text-xs text-zinc-500">Title</span>
+                <input
+                  value={form.title}
+                  onChange={(event) => updateField("title", event.target.value)}
+                  className="rounded-md border border-white/10 bg-[#0f1216] px-3 py-2 text-zinc-100 outline-none focus:border-emerald-400/60"
+                  placeholder="A clear, human title"
+                />
+              </label>
+              <label className="grid gap-2">
+                <span className="font-mono text-xs text-zinc-500">Slug</span>
+                <input
+                  value={form.slug}
+                  onChange={(event) => updateField("slug", event.target.value)}
+                  className="rounded-md border border-white/10 bg-[#0f1216] px-3 py-2 font-mono text-zinc-100 outline-none focus:border-emerald-400/60"
+                  placeholder="post-url-slug"
+                />
+              </label>
+            </div>
+
+            <label className="mt-4 grid gap-2">
+              <span className="font-mono text-xs text-zinc-500">Excerpt</span>
+              <textarea
+                value={form.excerpt}
+                onChange={(event) => updateField("excerpt", event.target.value)}
+                rows={3}
+                className="rounded-md border border-white/10 bg-[#0f1216] px-3 py-2 text-zinc-100 outline-none focus:border-emerald-400/60"
+                placeholder="Short description used in cards and article intro"
+              />
+            </label>
+
+            <div className="mt-4 grid gap-4 md:grid-cols-4">
+              <label className="grid gap-2">
+                <span className="font-mono text-xs text-zinc-500">Status</span>
+                <select
+                  value={form.status}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      status: event.target.value as BlogStatus,
+                    }))
+                  }
+                  className="rounded-md border border-white/10 bg-[#0f1216] px-3 py-2 text-zinc-100 outline-none focus:border-emerald-400/60"
+                >
+                  <option value="draft">Draft</option>
+                  <option value="published">Published</option>
+                </select>
+              </label>
+              <label className="grid gap-2">
+                <span className="font-mono text-xs text-zinc-500">
+                  Publish date
+                </span>
+                <input
+                  type="date"
+                  value={form.publishDate}
+                  onChange={(event) =>
+                    updateField("publishDate", event.target.value)
+                  }
+                  className="rounded-md border border-white/10 bg-[#0f1216] px-3 py-2 text-zinc-100 outline-none focus:border-emerald-400/60"
+                />
+              </label>
+              <label className="grid gap-2 md:col-span-2">
+                <span className="font-mono text-xs text-zinc-500">
+                  Tags, comma separated
+                </span>
+                <input
+                  value={form.tagsText}
+                  onChange={(event) =>
+                    updateField("tagsText", event.target.value)
+                  }
+                  className="rounded-md border border-white/10 bg-[#0f1216] px-3 py-2 text-zinc-100 outline-none focus:border-emerald-400/60"
+                  placeholder="React Native, AI, Firebase"
+                />
+              </label>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+            <h2 className="text-lg font-semibold text-zinc-50">SEO</h2>
+            <p className="mt-1 text-sm text-zinc-500">
+              Optional overrides. If blank, the post title and excerpt are used.
+            </p>
+            <div className="mt-5 grid gap-4 md:grid-cols-2">
+              <label className="grid gap-2">
+                <span className="font-mono text-xs text-zinc-500">SEO title</span>
+                <input
+                  value={form.seoTitle}
+                  onChange={(event) =>
+                    updateField("seoTitle", event.target.value)
+                  }
+                  className="rounded-md border border-white/10 bg-[#0f1216] px-3 py-2 text-zinc-100 outline-none focus:border-emerald-400/60"
+                />
+              </label>
+              <label className="grid gap-2">
+                <span className="font-mono text-xs text-zinc-500">
+                  SEO description
+                </span>
+                <input
+                  value={form.seoDescription}
+                  onChange={(event) =>
+                    updateField("seoDescription", event.target.value)
+                  }
+                  className="rounded-md border border-white/10 bg-[#0f1216] px-3 py-2 text-zinc-100 outline-none focus:border-emerald-400/60"
+                />
+              </label>
+            </div>
+            <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+              <label className="grid gap-2">
+                <span className="font-mono text-xs text-zinc-500">
+                  Social preview image
+                </span>
+                <input
+                  value={form.ogImageUrl}
+                  onChange={(event) =>
+                    updateField("ogImageUrl", event.target.value)
+                  }
+                  className="rounded-md border border-white/10 bg-[#0f1216] px-3 py-2 font-mono text-xs text-zinc-100 outline-none focus:border-emerald-400/60"
+                  placeholder="Generated automatically when you save"
+                />
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    className="inline-flex h-9 items-center gap-2 rounded-md border border-white/10 px-3 text-xs text-zinc-300 hover:bg-white/[0.05] disabled:cursor-not-allowed disabled:opacity-60"
+                    onClick={handleGeneratePreviewImage}
+                    disabled={isGeneratingImage || !form.title.trim()}
+                  >
+                    <Share2 className="h-3.5 w-3.5" />
+                    {isGeneratingImage ? "Generating..." : "Generate image"}
+                  </button>
+                  {form.ogImageUrl ? (
+                    <button
+                      className="inline-flex h-9 items-center gap-2 rounded-md border border-white/10 px-3 text-xs text-zinc-300 hover:bg-white/[0.05]"
+                      onClick={() =>
+                        setForm((current) => ({
+                          ...current,
+                          ogImageUrl: "",
+                        }))
+                      }
+                    >
+                      Clear
+                    </button>
+                  ) : null}
+                </div>
+              </label>
+              <div className="overflow-hidden rounded-xl border border-white/10 bg-[#0b0d10]">
+                {form.ogImageUrl ? (
+                  <img
+                    src={form.ogImageUrl}
+                    alt=""
+                    className="aspect-[1200/630] w-full object-cover"
+                  />
+                ) : (
+                  <div className="grid aspect-[1200/630] place-items-center px-6 text-center font-mono text-xs text-zinc-600">
+                    Saved posts get a GitHub-style preview card here.
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-6 2xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+            <label className="grid gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+              <div>
+                <span className="font-mono text-xs uppercase tracking-[0.18em] text-zinc-500">
+                  Markdown
+                </span>
+                <p className="mt-2 text-sm text-zinc-500">
+                  Paste the AI output&apos;s Markdown section here. README-style
+                  Markdown is supported.
+                </p>
+              </div>
+              <textarea
+                value={form.content}
+                onChange={(event) => updateField("content", event.target.value)}
+                rows={28}
+                className="min-h-[620px] rounded-xl border border-white/10 bg-[#0f1216] px-4 py-3 font-mono text-sm leading-7 text-zinc-100 outline-none focus:border-emerald-400/60"
+              />
+            </label>
+
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+              <div className="mb-3 flex items-center justify-between px-2 py-1">
+                <div className="inline-flex items-center gap-2 font-mono text-xs text-zinc-500">
+                  <Eye className="h-4 w-4" />
+                  Public preview
+                </div>
+                {form.slug ? (
+                  <button
+                    className="inline-flex h-8 items-center gap-2 rounded-md border border-white/10 px-3 text-xs text-zinc-300 hover:bg-white/[0.05]"
+                    onClick={() => navigate(`/blog/${form.slug}`)}
+                  >
+                    Open route
+                    <ArrowUpRight className="h-3.5 w-3.5" />
+                  </button>
+                ) : null}
+              </div>
+              <article className="rounded-xl border border-white/10 bg-[#0b0d10] px-5 py-8 sm:px-8">
+                <header className="mb-8">
+                  <p className="font-mono text-sm text-emerald-400">
+                    Back to blog
+                  </p>
+                  <h1 className="mt-8 text-3xl font-semibold tracking-tight text-zinc-50">
+                    {form.title || "Untitled post"}
+                  </h1>
+                  <p className="mt-3 font-mono text-xs text-zinc-500">
+                    {form.publishDate || "Today"} · Preview · {form.status}
+                    {form.tagsText ? ` · ${form.tagsText}` : ""}
+                  </p>
+                  {form.excerpt ? (
+                    <p className="mt-5 text-lg leading-8 text-zinc-400">
+                      {form.excerpt}
+                    </p>
+                  ) : null}
+                </header>
+                <MarkdownContent
+                  content={withoutDuplicateTitle(
+                    form.content,
+                    form.title || "Untitled post",
+                  )}
+                />
+              </article>
+            </div>
+          </div>
+
+          <div className="sticky bottom-4 z-10 flex flex-wrap items-center gap-3 rounded-2xl border border-white/10 bg-[#111418]/95 p-3 shadow-2xl shadow-black/40 backdrop-blur">
+            <button
+              className="inline-flex h-10 items-center gap-2 rounded-md bg-zinc-100 px-4 text-sm font-medium text-zinc-950 hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+              onClick={handleSave}
+              disabled={isSaving || !form.title.trim()}
+            >
+              <Save className="h-4 w-4" />
+              {isSaving ? "Saving..." : "Save post"}
+            </button>
+            <button
+              className="inline-flex h-10 items-center gap-2 rounded-md border border-white/10 px-4 text-sm text-zinc-200 hover:bg-white/[0.05]"
+              onClick={copyPrompt}
+            >
+              <Copy className="h-4 w-4" />
+              Copy AI prompt
+            </button>
+            {message ? (
+              <p className="font-mono text-sm text-zinc-500">{message}</p>
+            ) : null}
+          </div>
+        </section>
+      </div>
+    </main>
+  );
+}
+
+function AppShell() {
+  return (
+    <div className="min-h-screen bg-[#0b0d10] text-zinc-100">
+      <Header />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/blog" element={<BlogIndexPage />} />
+        <Route path="/blog/:slug" element={<BlogPostPage />} />
+        <Route path="/admin" element={<AdminPage />} />
+        <Route
+          path="*"
+          element={
+            <main className="mx-auto max-w-3xl px-5 py-16">
+              <Seo
+                title="Not found"
+                description="This page could not be found."
+                canonicalPath="/404"
+              />
+              <SectionHeading eyebrow="404" title="Page not found." />
+              <Link to="/" className="font-mono text-sm text-emerald-400">
+                Go home
+              </Link>
+            </main>
+          }
+        />
+      </Routes>
+      <Footer />
+    </div>
+  );
+}
+
+export default AppShell;

@@ -1,0 +1,23 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#0B0D10"/>
+  <path d="M0 0H1200V630H0V0Z" fill="url(#glow)"/>
+  <g opacity="0.16">
+    <path d="M80 0V630M128 0V630M176 0V630M224 0V630M272 0V630M320 0V630M368 0V630M416 0V630M464 0V630M512 0V630M560 0V630M608 0V630M656 0V630M704 0V630M752 0V630M800 0V630M848 0V630M896 0V630M944 0V630M992 0V630M1040 0V630M1088 0V630M1136 0V630" stroke="#FAFAFA"/>
+    <path d="M0 78H1200M0 126H1200M0 174H1200M0 222H1200M0 270H1200M0 318H1200M0 366H1200M0 414H1200M0 462H1200M0 510H1200M0 558H1200" stroke="#FAFAFA"/>
+  </g>
+  <rect x="74" y="74" width="1052" height="482" rx="22" stroke="#FFFFFF" stroke-opacity="0.12"/>
+  <text x="96" y="126" fill="#34D399" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="28" font-weight="700">mrdsa.dev</text>
+  <text x="96" y="238" fill="#FAFAFA" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif" font-size="78" font-weight="800">Dewan Shakil</text>
+  <text x="96" y="326" fill="#FAFAFA" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif" font-size="78" font-weight="800">Akhtar</text>
+  <text x="100" y="396" fill="#D4D4D8" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif" font-size="34" font-weight="500">Member of Technical Staff at Stellon Labs</text>
+  <text x="100" y="446" fill="#A1A1AA" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="24">on-device AI / React Native SDKs / product engineering</text>
+  <rect x="96" y="506" width="1008" height="4" fill="#34D399"/>
+  <text x="96" y="544" fill="#A1A1AA" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="22">github.com/imdewan  /  linkedin.com/in/mrdsa04</text>
+  <defs>
+    <linearGradient id="glow" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#34D399" stop-opacity="0.18"/>
+      <stop offset="0.48" stop-color="#14B8A6" stop-opacity="0.06"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+</svg>
