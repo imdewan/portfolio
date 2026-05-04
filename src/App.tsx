@@ -219,7 +219,9 @@ function formatDate(date?: Date | null) {
 }
 
 function withoutDuplicateTitle(content: string, title: string) {
-  const firstHeading = new RegExp(`^#\\s+${title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*\\n+`);
+  const firstHeading = new RegExp(
+    `^#\\s+${title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*\\n+`,
+  );
   return content.replace(firstHeading, "");
 }
 
@@ -460,9 +462,7 @@ function HomePage() {
           ) : posts.length > 0 ? (
             <BlogList posts={posts.slice(0, 3)} compact />
           ) : (
-            <p className="leading-7 text-zinc-500">
-              No published posts yet.
-            </p>
+            <p className="leading-7 text-zinc-500">No published posts yet.</p>
           )}
         </section>
 
@@ -627,8 +627,8 @@ function BlogPostPage() {
   async function sharePost() {
     if (navigator.share) {
       await navigator.share({
-        title: post.title,
-        text: post.excerpt,
+        title: post?.title,
+        text: post?.excerpt,
         url: postUrl,
       });
       return;
@@ -698,7 +698,9 @@ function BlogPostPage() {
           </p>
           <p className="mt-5 text-lg leading-8 text-zinc-400">{post.excerpt}</p>
         </header>
-        <MarkdownContent content={withoutDuplicateTitle(post.content, post.title)} />
+        <MarkdownContent
+          content={withoutDuplicateTitle(post.content, post.title)}
+        />
       </article>
     </main>
   );
@@ -837,17 +839,19 @@ function AdminPage() {
       }
 
       const payload: BlogPostInput = {
-      title: form.title.trim(),
-      slug,
-      excerpt: form.excerpt.trim(),
-      content: form.content,
-      status: form.status,
-      publishedAt: form.publishDate ? new Date(`${form.publishDate}T12:00:00`) : null,
-      tags,
-      seoTitle: form.seoTitle.trim() || undefined,
-      seoDescription: form.seoDescription.trim() || undefined,
-      ogImageUrl: ogImageUrl || undefined,
-    };
+        title: form.title.trim(),
+        slug,
+        excerpt: form.excerpt.trim(),
+        content: form.content,
+        status: form.status,
+        publishedAt: form.publishDate
+          ? new Date(`${form.publishDate}T12:00:00`)
+          : null,
+        tags,
+        seoTitle: form.seoTitle.trim() || undefined,
+        seoDescription: form.seoDescription.trim() || undefined,
+        ogImageUrl: ogImageUrl || undefined,
+      };
 
       const id = await savePost(payload, editingId);
       setEditingId(id);
@@ -1143,7 +1147,9 @@ function AdminPage() {
             </p>
             <div className="mt-5 grid gap-4 md:grid-cols-2">
               <label className="grid gap-2">
-                <span className="font-mono text-xs text-zinc-500">SEO title</span>
+                <span className="font-mono text-xs text-zinc-500">
+                  SEO title
+                </span>
                 <input
                   value={form.seoTitle}
                   onChange={(event) =>
