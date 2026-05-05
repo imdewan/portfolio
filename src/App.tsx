@@ -145,7 +145,7 @@ const stack = [
   },
   {
     name: "Convex",
-    icon: "https://media2.dev.to/dynamic/image/width=320,height=320,fit=cover,gravity=auto,format=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Forganization%2Fprofile_image%2F8065%2Fd559bbad-1732-4020-82c4-ad689dbdbc5d.png",
+    icon: "https://images.seeklogo.com/logo-png/65/2/convex-icon-logo-png_seeklogo-653467.png",
   },
 ];
 
@@ -627,8 +627,8 @@ function BlogPostPage() {
   async function sharePost() {
     if (navigator.share) {
       await navigator.share({
-        title: post?.title,
-        text: post?.excerpt,
+        title: post.title,
+        text: post.excerpt,
         url: postUrl,
       });
       return;

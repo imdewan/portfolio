@@ -58,6 +58,13 @@ export function Seo({
     setMeta('meta[property="og:image"]', "property", "og:image").content =
       previewImage;
     setMeta(
+      'meta[property="og:image:secure_url"]',
+      "property",
+      "og:image:secure_url",
+    ).content = previewImage;
+    setMeta('meta[property="og:image:type"]', "property", "og:image:type")
+      .content = "image/png";
+    setMeta(
       'meta[property="og:image:width"]',
       "property",
       "og:image:width",

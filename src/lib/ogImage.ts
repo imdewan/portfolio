@@ -12,12 +12,35 @@ function wrapText(
   context: CanvasRenderingContext2D,
   text: string,
   maxWidth: number,
+  maxLines = 3,
 ) {
   const words = text.split(/\s+/);
   const lines: string[] = [];
   let line = "";
 
   for (const word of words) {
+    if (context.measureText(word).width > maxWidth) {
+      if (line) {
+        lines.push(line);
+        line = "";
+      }
+
+      let chunk = "";
+      for (const character of word) {
+        const test = `${chunk}${character}`;
+        if (context.measureText(test).width <= maxWidth) {
+          chunk = test;
+          continue;
+        }
+
+        if (chunk) lines.push(chunk);
+        chunk = character;
+      }
+
+      line = chunk;
+      continue;
+    }
+
     const test = line ? `${line} ${word}` : word;
 
     if (context.measureText(test).width <= maxWidth) {
@@ -30,7 +53,31 @@ function wrapText(
   }
 
   if (line) lines.push(line);
-  return lines.slice(0, 4);
+  if (lines.length <= maxLines) return lines;
+
+  const visible = lines.slice(0, maxLines);
+  visible[maxLines - 1] = trimText(context, visible[maxLines - 1], maxWidth);
+  return visible;
+}
+
+function trimText(
+  context: CanvasRenderingContext2D,
+  text: string,
+  maxWidth: number,
+) {
+  if (context.measureText(text).width <= maxWidth) return text;
+
+  const ellipsis = "...";
+  let trimmed = text.trim();
+
+  while (
+    trimmed.length > 0 &&
+    context.measureText(`${trimmed}${ellipsis}`).width > maxWidth
+  ) {
+    trimmed = trimmed.slice(0, -1).trimEnd();
+  }
+
+  return `${trimmed}${ellipsis}`;
 }
 
 function canvasToBlob(canvas: HTMLCanvasElement) {
@@ -91,7 +138,7 @@ export async function generateAndUploadOgImage({
   context.fillStyle = "#fafafa";
   context.font =
     "700 76px Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
-  const lines = wrapText(context, title, 960);
+  const lines = wrapText(context, title, 960, 3);
   lines.forEach((line, index) => {
     context.fillText(line, 80, 210 + index * 88);
   });
@@ -99,10 +146,14 @@ export async function generateAndUploadOgImage({
   const meta = [date, ...tags].filter(Boolean).join("  /  ");
   context.fillStyle = "rgba(244, 244, 245, 0.62)";
   context.font = "500 28px monospace";
-  context.fillText(meta || "Dewan Shakil Akhtar", 82, 548);
+  context.fillText(
+    trimText(context, meta || "Dewan Shakil Akhtar", 1036),
+    82,
+    540,
+  );
 
   context.fillStyle = "#34d399";
-  context.fillRect(80, 578, 1040, 4);
+  context.fillRect(80, 568, 1040, 4);
 
   context.fillStyle = "rgba(244, 244, 245, 0.72)";
   context.font = "500 24px monospace";
