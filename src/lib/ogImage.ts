@@ -82,14 +82,18 @@ function trimText(
 
 function canvasToBlob(canvas: HTMLCanvasElement) {
   return new Promise<Blob>((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (blob) {
-        resolve(blob);
-        return;
-      }
+    canvas.toBlob(
+      (blob) => {
+        if (blob) {
+          resolve(blob);
+          return;
+        }
 
-      reject(new Error("Could not generate preview image."));
-    }, "image/png");
+        reject(new Error("Could not generate preview image."));
+      },
+      "image/webp",
+      0.82,
+    );
   });
 }
 
@@ -162,11 +166,11 @@ export async function generateAndUploadOgImage({
   const blob = await canvasToBlob(canvas);
   const imageRef = ref(
     storage,
-    `og-images/${slug || "untitled"}-${Date.now()}.png`,
+    `og-images/${slug || "untitled"}-${Date.now()}.webp`,
   );
 
   await uploadBytes(imageRef, blob, {
-    contentType: "image/png",
+    contentType: "image/webp",
     cacheControl: "public,max-age=31536000",
   });
 

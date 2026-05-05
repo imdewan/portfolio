@@ -63,7 +63,7 @@ export function Seo({
       "og:image:secure_url",
     ).content = previewImage;
     setMeta('meta[property="og:image:type"]', "property", "og:image:type")
-      .content = "image/png";
+      .content = previewImage.includes(".webp") ? "image/webp" : "image/png";
     setMeta(
       'meta[property="og:image:width"]',
       "property",

@@ -41,6 +41,7 @@ function createMetaTags({
   description,
   url,
   image,
+  imageType,
   type,
   publishedAt,
   updatedAt,
@@ -67,7 +68,7 @@ function createMetaTags({
     <meta property="og:url" content="${safeUrl}" />
     <meta property="og:image" content="${safeImage}" />
     <meta property="og:image:secure_url" content="${safeImage}" />
-    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:type" content="${escapeHtml(imageType)}" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="${safeTitle}" />${articleMeta}
@@ -124,6 +125,7 @@ export const blogMeta = onRequest(
       ? blogDescription
       : post?.seoDescription || post?.excerpt || siteDescription;
     const image = post?.ogImageUrl || fallbackImage;
+    const imageType = image.includes(".webp") ? "image/webp" : "image/png";
     const type = post ? "article" : "website";
 
     try {
@@ -135,6 +137,7 @@ export const blogMeta = onRequest(
           description,
           url,
           image,
+          imageType,
           type,
           publishedAt: toIsoDate(post?.publishedAt),
           updatedAt: toIsoDate(post?.updatedAt),
