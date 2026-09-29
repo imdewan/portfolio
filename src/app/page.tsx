@@ -97,7 +97,7 @@ export default function HomePage() {
           title="Writing, notes, and build logs."
         />
         {posts.length > 0 ? (
-          <BlogList posts={posts.slice(0, 4)} compact />
+          <BlogList posts={posts.slice(0, 3)} compact />
         ) : (
           <p className="leading-7 text-zinc-500">No published posts yet.</p>
         )}

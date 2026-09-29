@@ -33,20 +33,6 @@ export const projects = [
     status: "Current | Member of Technical Staff",
   },
   {
-    name: "claude-message-queue",
-    detail:
-      "Open-source Claude Code plugin and CLI that queues prompts per repo and runs them after the current turn ends, without interrupting it.",
-    href: "https://github.com/imdewan/claude-message-queue",
-    status: "Open source",
-  },
-  {
-    name: "Parity",
-    detail:
-      "Global pricing calculator that suggests local app prices for 160+ markets and generates App Store Connect pricing scripts.",
-    href: "https://parity-pricing.web.app",
-    status: "Side project",
-  },
-  {
     name: "SoyFin",
     detail:
       "AI-powered personal finance app for tracking spending, scanning receipts, and getting cleaner budget context.",
@@ -82,7 +68,6 @@ export const stack = [
   { name: "TypeScript", icon: `${devicon}/typescript/typescript-original.svg` },
   { name: "React Native", icon: `${devicon}/react/react-original.svg` },
   { name: "React", icon: `${devicon}/react/react-original.svg` },
-  { name: "Next.js", icon: `${devicon}/nextjs/nextjs-original.svg` },
   { name: "Node.js", icon: `${devicon}/nodejs/nodejs-original.svg` },
   { name: "Python", icon: `${devicon}/python/python-original.svg` },
   { name: "C++", icon: `${devicon}/cplusplus/cplusplus-original.svg` },
@@ -91,6 +76,10 @@ export const stack = [
   { name: "Supabase", icon: `${devicon}/supabase/supabase-original.svg` },
   { name: "Docker", icon: `${devicon}/docker/docker-original.svg` },
   { name: "GCP", icon: `${devicon}/googlecloud/googlecloud-original.svg` },
+  {
+    name: "Convex",
+    icon: "https://images.seeklogo.com/logo-png/65/2/convex-icon-logo-png_seeklogo-653467.png",
+  },
 ];
 
 export const personJsonLd = {
