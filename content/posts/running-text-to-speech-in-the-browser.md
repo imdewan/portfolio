@@ -7,6 +7,8 @@ tags: ["On-device AI", "Web", "WebAssembly", "KittenTTS"]
 seoDescription: "Building the KittenTTS web SDK: running a small text-to-speech model in the browser and Node.js with ONNX Runtime Web, a C++ phonemizer compiled to JavaScript, streaming audio, and word timings."
 ---
 
+![A studio microphone in a dark room](https://cdn.pixabay.com/photo/2023/03/25/20/30/podcast-7876792_1280.jpg)
+
 Most text-to-speech on the web works the same way. You send text to a server, the server sends audio back, and you pay for every sentence.
 
 At Stellon Labs we make [KittenTTS](https://github.com/KittenML/KittenTTS), a family of very small TTS models. The smallest one is 15 million parameters and about 25 MB when quantized to int8. That's small enough to ask a fun question: what if the browser just did all of it?

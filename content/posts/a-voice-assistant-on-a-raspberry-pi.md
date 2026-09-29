@@ -7,6 +7,8 @@ tags: ["On-device AI", "Raspberry Pi", "LLM", "KittenTTS"]
 seoDescription: "A fully offline voice assistant on a Raspberry Pi 3B+ using openWakeWord, whisper.cpp tiny.en, llama.cpp running Gemma 3 270M, and KittenTTS nano. Setup notes and what broke."
 ---
 
+![A Raspberry Pi board in a clear case](https://cdn.pixabay.com/photo/2016/05/10/14/05/raspberry-pi-1383832_1280.jpg)
+
 I had a Raspberry Pi 3B+ sitting in a drawer. 1 GB of RAM, a quad core ARM chip from 2018, and nothing to do.
 
 I wanted to know something simple: how small can a voice assistant get before it stops being useful? No cloud, no API keys, nothing leaving the device.

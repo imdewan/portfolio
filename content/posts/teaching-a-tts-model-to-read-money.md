@@ -7,6 +7,8 @@ tags: ["AI", "Python", "Text-to-speech", "KittenTTS"]
 seoDescription: "How text normalization works for text-to-speech: expanding abbreviations, currency, times, dates, and URLs into spoken words, plus returning character spans to map audio back to the original text."
 ---
 
+![Close up of old typewriter keys](https://cdn.pixabay.com/photo/2016/10/30/00/06/typewriter-1782062_1280.jpg)
+
 Here is a sentence:
 
 > Dr. Rivera paid $12.50 at 3:05 p.m.

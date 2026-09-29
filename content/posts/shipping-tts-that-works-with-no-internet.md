@@ -7,6 +7,8 @@ tags: ["React Native", "Swift", "On-device AI", "KittenTTS"]
 seoDescription: "How we let apps bundle KittenTTS models inside the app binary: a CLI that packs assets with a manifest, an Expo config plugin, and porting the same idea from React Native to Swift."
 ---
 
+![Looking out of an airplane window over land and water](https://cdn.pixabay.com/photo/2022/09/09/15/19/airplane-window-7443196_1280.jpg)
+
 There's a small lie in a lot of on-device AI.
 
 The model runs locally, sure. But the first time you open the app, it downloads the model from a server. If you're on a plane, in a basement, or on a flaky connection in a new country, that "offline" feature just shows a spinner.

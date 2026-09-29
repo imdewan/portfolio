@@ -7,6 +7,8 @@ tags: ["AI", "PyTorch", "Learning", "Apple Silicon"]
 seoDescription: "Notes from a React Native and on-device AI engineer starting to learn machine learning: setting up Anaconda and PyTorch on Apple Silicon with the MPS backend, and what felt familiar or strange."
 ---
 
+![A laptop showing code on a desk](https://cdn.pixabay.com/photo/2017/08/10/08/47/laptop-2620118_1280.jpg)
+
 Here is a slightly embarrassing thing to admit.
 
 A lot of my work is about running AI models on devices. Packaging them, loading them, calling them from React Native, making them feel fast inside a real app. I know a lot about what happens *after* a model exists.

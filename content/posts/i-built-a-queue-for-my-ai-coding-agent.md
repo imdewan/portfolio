@@ -7,6 +7,8 @@ tags: ["Claude Code", "Developer tools", "Open source", "Bash"]
 seoDescription: "Building claude-message-queue, an open-source Claude Code plugin and CLI: a durable FIFO queue per git repo, a Stop hook that auto-runs queued prompts, mkdir locks, and stale lock recovery."
 ---
 
+![A notepad with colorful sticky note tabs](https://cdn.pixabay.com/photo/2014/03/31/23/06/notepad-302288_1280.jpg)
+
 When I work with Claude Code, there's a moment that keeps happening.
 
 It's halfway through a task. I notice something else that needs doing. A test that should be added, a rename, a follow-up bug. I don't want to interrupt the current work, because interrupting usually makes things messier. So I tell myself I'll remember.

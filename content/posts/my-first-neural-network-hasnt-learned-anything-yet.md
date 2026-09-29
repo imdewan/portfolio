@@ -7,6 +7,8 @@ tags: ["AI", "PyTorch", "Learning", "MNIST"]
 seoDescription: "Building a first neural network in PyTorch: an MNIST multilayer perceptron on Apple Silicon MPS, what each line does, and why the training loop is the next step."
 ---
 
+![Code on a dark screen](https://cdn.pixabay.com/photo/2016/11/19/14/00/code-1839406_1280.jpg)
+
 I wrote my first neural network this week.
 
 It currently knows nothing.

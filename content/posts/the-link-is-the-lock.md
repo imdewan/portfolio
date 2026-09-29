@@ -7,6 +7,8 @@ tags: ["Firebase", "React", "Security", "Build log"]
 seoDescription: "Building a shareable greeting card app on Firestore with no accounts: unguessable nanoid slugs, get-but-no-list security rules, immutable documents, and fitting photos under the 1 MiB document limit."
 ---
 
+![A small wrapped gift on a wooden table](https://cdn.pixabay.com/photo/2016/05/28/00/06/gift-1420830_1280.jpg)
+
 Some projects start from a big idea. This one started from wanting to make someone smile.
 
 I wanted to send a birthday message that felt like more than a text. Something you open, like an envelope. With photos, a song, maybe a little quiz about us. And I wanted anyone to be able to make one in a couple of minutes and share it with a single link.
