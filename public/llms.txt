@@ -6,12 +6,13 @@ Primary pages:
 - https://mrdsa.dev/
 - https://mrdsa.dev/blog
 - https://mrdsa.dev/llms.txt
+- https://mrdsa.dev/rss.xml
 
 About:
 - Dewan Shakil Akhtar is a full-stack product engineer and builder.
 - He is a Member of Technical Staff at Stellon Labs, a San Francisco-based YC S25 company.
 - His current technical focus includes on-device AI, React Native SDKs, mobile product engineering, and full-stack systems.
-- He has built and shipped products including SoyFin, NOOL work, Ledref, Coldpen, and React Native/AI experiments.
+- He has built and shipped products including SoyFin, NOOL work, Ledref, Coldpen, Parity, claude-message-queue, and React Native/AI experiments.
 - Ledref and Coldpen are archived products; SoyFin is listed as past work, not current primary work.
 
 Topics:
@@ -19,7 +20,9 @@ Topics:
 - React Native SDKs
 - mobile AI product design
 - full-stack product engineering
-- Firebase and Firestore-backed writing tools
+- Next.js, Firebase, and small web tools
+- Claude Code tooling and developer workflows
+- learning ML and PyTorch on Apple Silicon
 - startup/product engineering lessons
 - build logs and engineering notes
 - personal essays about building software
