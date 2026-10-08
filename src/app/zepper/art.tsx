@@ -16,3 +16,35 @@ export function Check({ className = "" }: { className?: string }) {
     </svg>
   );
 }
+
+/** A four-pointed sparkle, between the features in the strip. */
+export function Sparkle({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <path d="M12 1.5 C 12.9 7.6, 16.4 11.1, 22.5 12 C 16.4 12.9, 12.9 16.4, 12 22.5 C 11.1 16.4, 7.6 12.9, 1.5 12 C 7.6 11.1, 11.1 7.6, 12 1.5 Z" fill="currentColor" />
+    </svg>
+  );
+}
+
+/** A wavy edge: `color` fills the lower part, drawn up into the section above (flipped, down into the one below). */
+export function Wave({ color, flip = false, className = "" }: { color: string; flip?: boolean; className?: string }) {
+  const periods = 32;
+  const w = 1440 / periods;
+  let d = "M0 14";
+  for (let i = 0; i < periods; i++) {
+    const x = i * w;
+    d += ` Q ${x + w / 4} 5 ${x + w / 2} 14 T ${x + w} 14`;
+  }
+  d += " V 28 H 0 Z";
+  return (
+    <svg
+      viewBox="0 0 1440 28"
+      preserveAspectRatio="none"
+      className={`block h-4 w-full md:h-6 ${className}`}
+      style={flip ? { transform: "scaleY(-1)" } : undefined}
+      aria-hidden
+    >
+      <path d={d} fill={color} />
+    </svg>
+  );
+}

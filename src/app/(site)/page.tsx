@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { ArrowUpRight, Mail, Terminal } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, ArrowUpRight, Mail, Terminal } from "lucide-react";
 import { BlogList } from "@/components/BlogList";
 import { JsonLd } from "@/components/JsonLd";
 import { SectionHeading } from "@/components/SectionHeading";
@@ -91,6 +92,26 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section aria-label="Zepper" className="pb-14">
+        <Link
+          href="/zepper"
+          className="group relative flex flex-col gap-5 overflow-hidden rounded-2xl border border-[#9fb6ff]/20 bg-gradient-to-br from-[#18245f] to-[#0e1538] p-6 transition-colors hover:border-[#9fb6ff]/40 sm:flex-row sm:items-center"
+        >
+          <Image src="/zepper/icon-light.png" alt="" width={64} height={64} className="h-16 w-16 shrink-0" />
+          <div className="min-w-0 flex-1">
+            <div className="mb-1.5 font-mono text-xs uppercase tracking-wider text-[#9fb6ff]">New · Zepper</div>
+            <h2 className="text-xl font-semibold text-zinc-50">I made a browser.</h2>
+            <p className="mt-1.5 leading-7 text-zinc-300">
+              Zepper is a free, open-source browser for the Mac: Spaces, a sidebar built for tabs, and privacy that&apos;s
+              on from the first page.
+            </p>
+          </div>
+          <span className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-[#b9c8ff] transition-transform group-hover:translate-x-0.5">
+            Take a look <ArrowRight className="h-4 w-4" />
+          </span>
+        </Link>
+      </section>
+
       <section id="blog" className="border-t border-white/10 py-14">
         <SectionHeading
           eyebrow="Recent posts"
@@ -128,8 +149,7 @@ export default function HomePage() {
                 {project.href ? (
                   <a
                     href={project.href}
-                    target="_blank"
-                    rel="noreferrer"
+                    {...(project.href.startsWith("/") ? {} : { target: "_blank", rel: "noreferrer" })}
                     aria-label={`Open ${project.name}`}
                     className="mt-1 shrink-0 text-zinc-500 transition-colors hover:text-zinc-100"
                   >

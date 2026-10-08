@@ -8,12 +8,12 @@ export interface Release {
   publishedAt: string | null;
 }
 
-/** Zepper's latest release on GitHub (checked at most hourly), so the page always offers the current build. */
-export async function latestRelease(): Promise<Release> {
+/** Zepper's latest release on GitHub, checked again after `maxAge` seconds, so the page always offers the current build. */
+export async function latestRelease(maxAge = 300): Promise<Release> {
   try {
     const res = await fetch("https://api.github.com/repos/imdewan/zepper-browser/releases/latest", {
       headers: { Accept: "application/vnd.github+json" },
-      next: { revalidate: 3600 },
+      next: { revalidate: maxAge },
     });
     if (!res.ok) throw new Error(`GitHub answered ${res.status}`);
     const data = (await res.json()) as {

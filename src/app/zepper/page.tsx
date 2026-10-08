@@ -18,13 +18,15 @@ import {
 import { JsonLd } from "@/components/JsonLd";
 import { GithubIcon } from "@/components/icons";
 import { siteUrl } from "@/lib/site";
-import { AppleLogo, Check } from "./art";
+import { AppleLogo, Check, Sparkle, Wave } from "./art";
 import { LoopVideo } from "./LoopVideo";
 import { latestRelease, releasesUrl, repoUrl } from "./release";
 import styles from "./zepper.module.css";
 
-// The download button follows the latest release: the page is rebuilt at most hourly.
-export const revalidate = 3600;
+// The version shown follows the latest release (checked every few minutes); the buttons go through
+// /zepper/download, which finds the newest .dmg when you click.
+export const revalidate = 300;
+const DOWNLOAD = "/zepper/download";
 
 const display = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-display", axes: ["opsz", "wdth"] });
 const serif = Instrument_Serif({ subsets: ["latin"], weight: "400", style: ["normal", "italic"], variable: "--font-serif" });
@@ -240,7 +242,7 @@ export default async function ZepperPage() {
   const meta = [release.version ? `Version ${release.version}` : null, "Apple silicon", "macOS 14 or later"].filter(Boolean).join(" · ");
   const grain = (amount: number) => ({ ["--grain" as string]: amount }) as React.CSSProperties;
   // How far the hero's window reaches up into the navy (the rest sits on the cream below).
-  const overlap = "clamp(150px, 24vw, 340px)";
+  const overlap = "clamp(170px, 28vw, 400px)";
 
   return (
     <div
@@ -264,10 +266,10 @@ export default async function ZepperPage() {
       />
 
       {/* Hero */}
-      <section className={`${styles.grain} text-white`} style={{ background: NAVY, ...grain(0.42) }}>
+      <section className={`${styles.grainDark} text-white`} style={{ background: NAVY, ...grain(0.3) }}>
         <header className="mx-auto flex max-w-6xl items-center justify-between px-5 py-5">
           <Link href="/zepper" className={`${styles.display} flex items-center gap-2.5 text-lg font-bold`}>
-            <Image src="/zepper/icon.png" alt="" width={32} height={32} className="rounded-[9px]" priority />
+            <Image src="/zepper/icon-light.png" alt="" width={34} height={34} priority />
             Zepper
           </Link>
           <nav className="hidden items-center gap-8 text-[0.92rem] text-white/70 md:flex" aria-label="Zepper">
@@ -289,7 +291,7 @@ export default async function ZepperPage() {
             </a>
           </nav>
           <a
-            href={release.downloadUrl}
+            href={DOWNLOAD}
             className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#18245f] transition hover:bg-[#eef1ff]"
           >
             <AppleLogo className="h-3.5 w-3.5 -translate-y-px" />
@@ -297,29 +299,29 @@ export default async function ZepperPage() {
           </a>
         </header>
 
-        <div className="mx-auto max-w-4xl px-5 pb-16 pt-14 text-center md:pt-20">
-          <a
-            href={releasesUrl}
-            className="inline-flex items-center gap-2 rounded-full bg-white/[0.07] px-3.5 py-1.5 text-[0.82rem] text-white/80 ring-1 ring-white/15 transition-colors hover:bg-white/[0.12]"
-          >
-            <span className="h-1.5 w-1.5 rounded-full bg-[#8fb0ff]" />
-            {release.version ? `Zepper ${release.version} is out` : "The latest Zepper is out"}
-            <ArrowRight className="h-3.5 w-3.5 text-white/50" />
-          </a>
-          <h1 className="mt-8">
-            <span className={`${styles.display} block text-[3.1rem] font-bold leading-[0.98] sm:text-[4.4rem] md:text-[5.6rem]`}>
+        <div className="mx-auto max-w-4xl px-5 pb-10 pt-6 text-center md:pt-8">
+          <Image
+            src="/zepper/logo.png"
+            alt="Zepper"
+            width={469}
+            height={300}
+            priority
+            className="mx-auto h-auto w-[132px] drop-shadow-[0_12px_28px_rgba(0,0,0,0.35)] md:w-[150px]"
+          />
+          <h1 className="mt-6">
+            <span className={`${styles.display} block text-[2.9rem] font-bold leading-[0.98] sm:text-[4rem] md:text-[4.9rem]`}>
               Tabs in their place.
             </span>
-            <span className={`${styles.serif} block text-[3.3rem] leading-[1.04] text-[#b9c8ff] sm:text-[4.7rem] md:text-[6rem]`}>
+            <span className={`${styles.serif} block text-[3.1rem] leading-[1.04] text-[#b9c8ff] sm:text-[4.3rem] md:text-[5.3rem]`}>
               Trackers out of it.
             </span>
           </h1>
-          <p className="mx-auto mt-7 max-w-xl text-lg leading-relaxed text-white/70 md:text-[1.2rem]">
+          <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-white/70 md:text-[1.15rem]">
             A free, open-source browser for your Mac, with Spaces, a sidebar built for tabs, and privacy that&apos;s on from
             the very first page.
           </p>
-          <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <DownloadButton href={release.downloadUrl} />
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <DownloadButton href={DOWNLOAD} />
             <a
               href={repoUrl}
               className="inline-flex items-center gap-2.5 rounded-full px-6 py-3.5 font-semibold text-white ring-1 ring-white/25 transition hover:bg-white/[0.06] hover:ring-white/40"
@@ -328,14 +330,21 @@ export default async function ZepperPage() {
               View on GitHub
             </a>
           </div>
-          <p className="mt-5 text-sm text-white/50">{meta}</p>
+          <p className="mt-4 text-sm text-white/60">
+            {release.version ? (
+              <a href={releasesUrl} className="text-white/80 underline-offset-4 hover:text-white hover:underline">
+                What&apos;s new in {release.version}
+              </a>
+            ) : null}
+            {release.version ? " · " : ""}Apple silicon · macOS 14 or later
+          </p>
         </div>
         <div style={{ height: overlap }} />
       </section>
 
       {/* The window, from the navy onto the cream. */}
       <div className="relative z-10 mx-auto max-w-6xl px-4 md:px-5" style={{ marginTop: `calc(-1 * ${overlap})` }}>
-        <WindowClip name="spaces-window" label="Switching between three spaces in Zepper, each with its own colours and tabs" width={1920} height={1200} />
+        <WindowClip name="tour-window" label="Zepper's sidebar: Essentials, pinned tabs and a folder, clicking between pages" width={1920} height={1200} />
       </div>
 
       <div className={styles.grain} style={grain(0.22)}>
@@ -349,20 +358,24 @@ export default async function ZepperPage() {
             ))}
           </dl>
 
-          {/* Strip of features */}
-          <div className={`${styles.marqueeTrack} overflow-hidden border-y border-[#111633]/10 py-4`}>
-            <div className={styles.marquee}>
-              {[0, 1].map((copy) => (
-                <div key={copy} className="flex shrink-0 items-center" aria-hidden={copy === 1}>
-                  {strip.map((item) => (
-                    <span key={item} className="flex items-center whitespace-nowrap text-[0.95rem] font-medium text-[#18245f]/70">
-                      <span className="px-6">{item}</span>
-                      <span className="h-1 w-1 rounded-full bg-[#18245f]/30" />
-                    </span>
-                  ))}
-                </div>
-              ))}
+          {/* Strip of features, a navy band with wavy edges. */}
+          <div className="mt-2">
+            <Wave color={NAVY} />
+            <div className={`${styles.marqueeTrack} ${styles.grainDark} overflow-hidden py-5`} style={{ background: NAVY, ...grain(0.28) }}>
+              <div className={styles.marquee}>
+                {[0, 1].map((copy) => (
+                  <div key={copy} className="flex shrink-0 items-center" aria-hidden={copy === 1}>
+                    {strip.map((item) => (
+                      <span key={item} className={`${styles.display} flex items-center whitespace-nowrap text-xl font-semibold text-white/90 md:text-2xl`}>
+                        <span className="px-6">{item}</span>
+                        <Sparkle className="h-3.5 w-3.5 text-[#9fb6ff]" />
+                      </span>
+                    ))}
+                  </div>
+                ))}
+              </div>
             </div>
+            <Wave color={NAVY} flip />
           </div>
 
           <main>
@@ -437,21 +450,32 @@ export default async function ZepperPage() {
               then tucks itself away again.
             </Feature>
 
-            <section className="mx-auto grid max-w-6xl gap-12 px-5 pb-24 pt-10 md:grid-cols-2 md:gap-10">
-              <div>
-                <Clip name="swipe" label="A two-finger swipe going back a page in Zepper" />
-                <h3 className={`${styles.display} mt-7 text-2xl font-bold text-[#18245f]`}>Back with a swipe.</h3>
-                <p className="mt-2 max-w-sm leading-relaxed text-[#111633]/70">
-                  Two fingers on the trackpad, with an arrow that fills as you go, so you know when letting go will take you
-                  back.
-                </p>
+            <section className="mx-auto max-w-6xl px-5 pb-24 pt-10">
+              <div className="max-w-2xl">
+                <Eyebrow>Only in Zepper</Eyebrow>
+                <Heading className="text-[#18245f]">
+                  Things your browser <span className={`${styles.serif} font-normal text-[#3a5bd9]`}>can&apos;t do.</span>
+                </Heading>
               </div>
-              <div>
-                <Clip name="links" label="Pointing at links in Zepper shows where they go, in the corner of the page" width={1600} height={1036} />
-                <h3 className={`${styles.display} mt-7 text-2xl font-bold text-[#18245f]`}>Know where a link goes.</h3>
-                <p className="mt-2 max-w-sm leading-relaxed text-[#111633]/70">
-                  Point at a link and its address appears in the corner, with the site in bold, before you click.
-                </p>
+              <div className="mt-12 grid gap-12 md:grid-cols-2 md:gap-10">
+                <div>
+                  <Clip name="tidy" label="Tidy grouping a space's tabs into named folders with Apple Intelligence" />
+                  <h3 className={`${styles.display} mt-7 flex items-center gap-2.5 text-2xl font-bold text-[#18245f]`}>Tidy, in one click.</h3>
+                  <p className="mt-2 max-w-md leading-relaxed text-[#111633]/70">
+                    Apple Intelligence sorts a messy space into folders with sensible names, right on your Mac. Not what you
+                    wanted? Undo puts every tab back.
+                  </p>
+                </div>
+                <div>
+                  <Clip name="capture" label="Capturing one element of a page with ⇧⌘2, copied straight to the clipboard" />
+                  <h3 className={`${styles.display} mt-7 flex items-center gap-2.5 text-2xl font-bold text-[#18245f]`}>
+                    Capture just the part you need. <Kbd>⇧⌘2</Kbd>
+                  </h3>
+                  <p className="mt-2 max-w-md leading-relaxed text-[#111633]/70">
+                    Click an element, drag a region, or take the whole page. It&apos;s on your clipboard at once, ready to paste,
+                    with a thumbnail you can drag into other apps.
+                  </p>
+                </div>
               </div>
             </section>
           </main>
@@ -459,7 +483,7 @@ export default async function ZepperPage() {
       </div>
 
       {/* Privacy */}
-      <section id="privacy" className={`${styles.grain} scroll-mt-4 text-white`} style={{ background: DEEP, ...grain(0.4) }}>
+      <section id="privacy" className={`${styles.grainDark} scroll-mt-4 text-white`} style={{ background: DEEP, ...grain(0.28) }}>
         <div className="mx-auto grid max-w-6xl items-center gap-14 px-5 py-24 md:grid-cols-[1.05fr_0.95fr] md:py-28">
           <div>
             <Eyebrow dark>Privacy</Eyebrow>
@@ -482,13 +506,15 @@ export default async function ZepperPage() {
               ))}
             </ul>
           </div>
-          <WindowClip
-            name="privacy-window"
-            label="Zepper's site panel: the certificate, protections with 11 trackers blocked, and permissions"
-            width={1600}
-            height={1166}
-            corners="1.6% / 2.2%"
-          />
+          <div className="mx-auto w-full max-w-[460px]">
+            <WindowClip
+              name="privacy-panel"
+              label="Zepper's site panel opening its protections: ads and trackers, cookie banners, fingerprinting and more, each with its own switch"
+              width={1600}
+              height={1612}
+              corners="2% / 2%"
+            />
+          </div>
         </div>
       </section>
 
@@ -519,7 +545,7 @@ export default async function ZepperPage() {
 
           {/* Developers */}
           <section id="developers" className="mx-auto max-w-6xl scroll-mt-6 px-5 pb-24">
-            <div className={`${styles.grain} overflow-hidden rounded-[30px] text-white`} style={{ background: NAVY, ...grain(0.38) }}>
+            <div className={`${styles.grainDark} overflow-hidden rounded-[30px] text-white`} style={{ background: NAVY, ...grain(0.25) }}>
               <div className="grid items-center gap-12 p-8 md:grid-cols-2 md:p-14">
                 <div>
                   <Eyebrow dark>For developers</Eyebrow>
@@ -595,7 +621,7 @@ export default async function ZepperPage() {
       </div>
 
       {/* Download */}
-      <section id="download" className={`${styles.grain} text-center text-white`} style={{ background: NAVY, ...grain(0.42) }}>
+      <section id="download" className={`${styles.grainDark} text-center text-white`} style={{ background: NAVY, ...grain(0.3) }}>
         <div className="mx-auto max-w-3xl px-5 py-24 md:py-28">
           <Image src="/zepper/icon@2x.png" alt="" width={96} height={96} className="mx-auto drop-shadow-[0_16px_30px_rgba(0,0,0,0.4)]" />
           <h2 className={`${styles.display} mt-8 text-[2.8rem] font-bold leading-[1] md:text-[4.2rem]`}>
@@ -606,7 +632,7 @@ export default async function ZepperPage() {
             about a minute.
           </p>
           <div className="mt-10 flex justify-center">
-            <DownloadButton href={release.downloadUrl} />
+            <DownloadButton href={DOWNLOAD} />
           </div>
           <p className="mt-5 text-sm text-white/50">{meta}</p>
           <ol className="mx-auto mt-14 grid max-w-3xl gap-4 text-left sm:grid-cols-3">

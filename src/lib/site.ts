@@ -19,12 +19,20 @@ export const socials = [
 export const navItems = [
   { label: "About", href: "/#about" },
   { label: "Blog", href: "/blog" },
+  { label: "Zepper", href: "/zepper" },
   { label: "Work", href: "/#work" },
   { label: "Stack", href: "/#stack" },
   { label: "Contact", href: "/#contact" },
 ];
 
 export const projects = [
+  {
+    name: "Zepper",
+    detail:
+      "A free, open-source browser for macOS: Spaces, a sidebar built for tabs, split view and privacy on by default. Built on Chromium, with an interface in React you can make your own.",
+    href: "/zepper",
+    status: "Current | Maker",
+  },
   {
     name: "Stellon Labs",
     detail:

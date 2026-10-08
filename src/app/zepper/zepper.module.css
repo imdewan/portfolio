@@ -1,22 +1,36 @@
-/* Film grain behind a section's content: high-contrast specks, blended into the colour underneath. */
-.grain {
+/* Film grain behind a section's content. On cream: fine specks blended into the colour. */
+.grain,
+.grainDark {
   position: relative;
   isolation: isolate;
 }
 
-.grain::before {
+.grain::before,
+.grainDark::before {
   content: "";
   position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
+}
+
+.grain::before {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.78' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='2.6' intercept='-.8'/%3E%3CfeFuncG type='linear' slope='2.6' intercept='-.8'/%3E%3CfeFuncB type='linear' slope='2.6' intercept='-.8'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size: 220px 220px;
   mix-blend-mode: overlay;
-  opacity: var(--grain, 0.4);
+  opacity: var(--grain, 0.22);
 }
 
-.grain > * {
+/* On navy, where blending mutes it: light and dark specks laid on as they are (public/zepper/grain.png,
+   drawn at retina density). */
+.grainDark::before {
+  background-image: url("/zepper/grain.png");
+  background-size: 160px 160px;
+  opacity: var(--grain, 0.7);
+}
+
+.grain > *,
+.grainDark > * {
   position: relative;
   z-index: 1;
 }
