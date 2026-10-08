@@ -13,6 +13,7 @@ export function LoopVideo({
   height,
   label,
   className = "",
+  style,
 }: {
   src: string;
   poster: string;
@@ -20,6 +21,7 @@ export function LoopVideo({
   height: number;
   label: string;
   className?: string;
+  style?: React.CSSProperties;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
 
@@ -45,6 +47,7 @@ export function LoopVideo({
     <video
       ref={ref}
       className={className}
+      style={style}
       src={src}
       poster={poster}
       width={width}

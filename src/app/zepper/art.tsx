@@ -1,91 +1,18 @@
-import styles from "./zepper.module.css";
-
-/** A round stamp whose words turn slowly around the Zepper icon. */
-export function Stamp({ className = "" }: { className?: string }) {
+/** Apple's logo, for the download buttons. */
+export function AppleLogo({ className = "" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 120 120" className={className} aria-hidden>
-      <circle cx="60" cy="60" r="58" fill="#ffd166" />
-      <circle cx="60" cy="60" r="52" fill="none" stroke="#14183a" strokeWidth="1.2" strokeDasharray="2 3" />
-      <defs>
-        <path id="stamp-ring" d="M60 60 m-41 0 a41 41 0 1 1 82 0 a41 41 0 1 1 -82 0" />
-        <clipPath id="stamp-icon">
-          <rect x="41" y="41" width="38" height="38" rx="10" />
-        </clipPath>
-      </defs>
-      <g className={styles.spin}>
-        {/* Exactly once around the ring, so the words meet without overlapping. */}
-        <text fontSize="9.6" fontWeight="800" fill="#14183a" fontFamily="var(--font-display)" textLength="254" lengthAdjust="spacing">
-          <textPath href="#stamp-ring">FREE ✦ OPEN SOURCE ✦ MADE FOR MAC ✦</textPath>
-        </text>
-      </g>
-      <image href="/zepper/icon.png" x="38" y="38" width="44" height="44" clipPath="url(#stamp-icon)" />
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden>
+      <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701" />
     </svg>
   );
 }
 
-/** A quick hand-drawn underline. */
-export function Squiggle({ className = "", color = "#ffd166" }: { className?: string; color?: string }) {
+/** A check mark for the list of protections. */
+export function Check({ className = "" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 300 26" preserveAspectRatio="none" className={`${styles.draw} ${className}`} aria-hidden>
-      <path
-        pathLength={1}
-        d="M4 17 C 46 6, 84 22, 124 13 S 196 5, 232 14 S 280 18, 296 9"
-        fill="none"
-        stroke={color}
-        strokeWidth="6"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-/** A loose arrow, for the handwritten notes. */
-export function Arrow({ className = "", color = "#ffd166", flip = false }: { className?: string; color?: string; flip?: boolean }) {
-  return (
-    <svg viewBox="0 0 120 90" className={`${styles.draw} ${className}`} style={flip ? { transform: "scaleX(-1)" } : undefined} aria-hidden>
-      <path pathLength={1} d="M8 10 C 40 4, 78 18, 92 52 S 100 74, 98 80" fill="none" stroke={color} strokeWidth="3.4" strokeLinecap="round" />
-      <path pathLength={1} d="M84 66 L 98 82 L 110 62" fill="none" stroke={color} strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-/** A hand-drawn tick. */
-export function Tick({ className = "", color = "#ffd166" }: { className?: string; color?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} aria-hidden>
-      <path d="M3.5 13.2 C 6 14.6, 7.8 16.6, 9.4 19.4 C 12.4 12.6, 16.2 8, 21 4.4" fill="none" stroke={color} strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-/** A four-pointed sparkle, for the strip of features. */
-export function Sparkle({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} aria-hidden>
-      <path d="M12 1.5 C 12.9 7.6, 16.4 11.1, 22.5 12 C 16.4 12.9, 12.9 16.4, 12 22.5 C 11.1 16.4, 7.6 12.9, 1.5 12 C 7.6 11.1, 11.1 7.6, 12 1.5 Z" fill="currentColor" />
-    </svg>
-  );
-}
-
-/** A wavy edge between two sections: `color` is the section it belongs to, drawn up into the one above. */
-export function Wave({ color, flip = false, className = "" }: { color: string; flip?: boolean; className?: string }) {
-  const periods = 30;
-  const w = 1440 / periods;
-  let d = "M0 14";
-  for (let i = 0; i < periods; i++) {
-    const x = i * w;
-    d += ` Q ${x + w / 4} 4 ${x + w / 2} 14 T ${x + w} 14`;
-  }
-  d += " V 28 H 0 Z";
-  return (
-    <svg
-      viewBox="0 0 1440 28"
-      preserveAspectRatio="none"
-      className={`block h-5 w-full md:h-7 ${className}`}
-      style={flip ? { transform: "scaleY(-1)" } : undefined}
-      aria-hidden
-    >
-      <path d={d} fill={color} />
+    <svg viewBox="0 0 20 20" className={className} aria-hidden>
+      <circle cx="10" cy="10" r="10" fill="currentColor" opacity="0.16" />
+      <path d="M6 10.4l2.6 2.6L14 7.4" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
