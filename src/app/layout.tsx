@@ -1,7 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import { siteDescription, siteName, siteTitle, siteUrl } from "@/lib/site";
 import "./globals.css";
 
@@ -70,13 +68,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`dark ${inter.variable} ${mono.variable}`}>
-      <body className="font-sans">
-        <div className="min-h-screen bg-[#0b0d10] text-zinc-100">
-          <Header />
-          {children}
-          <Footer />
-        </div>
-      </body>
+      <body className="font-sans">{children}</body>
     </html>
   );
 }

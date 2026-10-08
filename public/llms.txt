@@ -5,6 +5,7 @@ Personal site, portfolio, and blog for Dewan Shakil Akhtar.
 Primary pages:
 - https://mrdsa.dev/
 - https://mrdsa.dev/blog
+- https://mrdsa.dev/zepper (Zepper, his open-source browser for macOS)
 - https://mrdsa.dev/llms.txt
 - https://mrdsa.dev/rss.xml
 
