@@ -52,9 +52,9 @@ export const metadata: Metadata = {
     description,
     url: "/zepper",
     locale: "en_US",
-    images: [{ url: "/zepper/og.png", width: 1200, height: 630, alt: "Zepper: tabs in their place, trackers out of it" }],
+    images: [{ url: "/zepper/og-navy.png", width: 1200, height: 630, alt: "Zepper: tabs in their place, trackers out of it" }],
   },
-  twitter: { card: "summary_large_image", creator: "@mrdsa04", title, description, images: ["/zepper/og.png"] },
+  twitter: { card: "summary_large_image", creator: "@mrdsa04", title, description, images: ["/zepper/og-navy.png"] },
 };
 
 const strip = [
