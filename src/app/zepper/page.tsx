@@ -346,7 +346,7 @@ export default async function ZepperPage() {
         <div className="flow-root">
           {/* The window, from the navy onto the cream (inside the cream, so the grain runs beside it). */}
           <div className="relative z-10 mx-auto max-w-6xl px-4 md:px-5" style={{ marginTop: `calc(-1 * ${overlap})` }}>
-            <WindowClip name="tour-window" label="Zepper's sidebar: Essentials, pinned tabs and a folder, clicking between pages" width={1920} height={1200} />
+            <WindowClip name="showcase" label="Zepper in one take: Tidy sorting a messy space, the command bar opening Mount Fuji with a bang, split view, compact mode and a swipe to another space" width={1920} height={1200} />
           </div>
           <dl className="mx-auto grid max-w-6xl grid-cols-2 gap-x-6 gap-y-8 px-5 pb-16 pt-14 md:grid-cols-4 md:pt-16">
             {facts.map(([fact, detail]) => (
