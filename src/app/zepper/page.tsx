@@ -241,6 +241,8 @@ export default async function ZepperPage() {
   const release = await latestRelease();
   const meta = [release.version ? `Version ${release.version}` : null, "Apple silicon", "macOS 14 or later"].filter(Boolean).join(" · ");
   const grain = (amount: number) => ({ ["--grain" as string]: amount }) as React.CSSProperties;
+  // How far the hero's window reaches up into the navy (the rest sits on the cream below).
+  const overlap = "clamp(170px, 28vw, 400px)";
 
   return (
     <div
@@ -337,14 +339,15 @@ export default async function ZepperPage() {
             {release.version ? " · " : ""}Apple silicon · macOS 14 or later
           </p>
         </div>
-        {/* The window sits on the navy; the cream starts below it. */}
-        <div className="mx-auto max-w-6xl px-4 pb-20 md:px-5 md:pb-24">
-          <WindowClip name="tour-window" label="Zepper's sidebar: Essentials, pinned tabs and a folder, clicking between pages" width={1920} height={1200} />
-        </div>
+        <div style={{ height: overlap }} />
       </section>
 
-      <div className={styles.grain} style={grain(0.22)}>
-        <div>
+      <div className={`${styles.grain} flow-root`} style={grain(0.22)}>
+        <div className="flow-root">
+          {/* The window, from the navy onto the cream (inside the cream, so the grain runs beside it). */}
+          <div className="relative z-10 mx-auto max-w-6xl px-4 md:px-5" style={{ marginTop: `calc(-1 * ${overlap})` }}>
+            <WindowClip name="tour-window" label="Zepper's sidebar: Essentials, pinned tabs and a folder, clicking between pages" width={1920} height={1200} />
+          </div>
           <dl className="mx-auto grid max-w-6xl grid-cols-2 gap-x-6 gap-y-8 px-5 pb-16 pt-14 md:grid-cols-4 md:pt-16">
             {facts.map(([fact, detail]) => (
               <div key={fact} className="border-l-2 border-[#18245f]/15 pl-4">
