@@ -266,7 +266,7 @@ export default async function ZepperPage() {
       />
 
       {/* Hero */}
-      <section className={`${styles.grainDark} text-white`} style={{ background: NAVY, ...grain(0.3) }}>
+      <section className={`${styles.grainDark} text-white`} style={{ background: NAVY, ...grain(0.18) }}>
         <header className="mx-auto flex max-w-6xl items-center justify-between px-5 py-5">
           <Link href="/zepper" className={`${styles.display} flex items-center gap-2.5 text-lg font-bold`}>
             <Image src="/zepper/icon-light.png" alt="" width={34} height={34} priority />
@@ -361,7 +361,7 @@ export default async function ZepperPage() {
           {/* Strip of features, a navy band with wavy edges. */}
           <div className="mt-2">
             <Wave color={NAVY} />
-            <div className={`${styles.marqueeTrack} ${styles.grainDark} overflow-hidden py-5`} style={{ background: NAVY, ...grain(0.28) }}>
+            <div className={`${styles.marqueeTrack} ${styles.grainDark} overflow-hidden py-5`} style={{ background: NAVY, ...grain(0.16) }}>
               <div className={styles.marquee}>
                 {[0, 1].map((copy) => (
                   <div key={copy} className="flex shrink-0 items-center" aria-hidden={copy === 1}>
@@ -483,7 +483,7 @@ export default async function ZepperPage() {
       </div>
 
       {/* Privacy */}
-      <section id="privacy" className={`${styles.grainDark} scroll-mt-4 text-white`} style={{ background: DEEP, ...grain(0.28) }}>
+      <section id="privacy" className={`${styles.grainDark} scroll-mt-4 text-white`} style={{ background: DEEP, ...grain(0.16) }}>
         <div className="mx-auto grid max-w-6xl items-center gap-14 px-5 py-24 md:grid-cols-[1.05fr_0.95fr] md:py-28">
           <div>
             <Eyebrow dark>Privacy</Eyebrow>
@@ -545,7 +545,7 @@ export default async function ZepperPage() {
 
           {/* Developers */}
           <section id="developers" className="mx-auto max-w-6xl scroll-mt-6 px-5 pb-24">
-            <div className={`${styles.grainDark} overflow-hidden rounded-[30px] text-white`} style={{ background: NAVY, ...grain(0.25) }}>
+            <div className={`${styles.grainDark} overflow-hidden rounded-[30px] text-white`} style={{ background: NAVY, ...grain(0.15) }}>
               <div className="grid items-center gap-12 p-8 md:grid-cols-2 md:p-14">
                 <div>
                   <Eyebrow dark>For developers</Eyebrow>
@@ -621,7 +621,7 @@ export default async function ZepperPage() {
       </div>
 
       {/* Download */}
-      <section id="download" className={`${styles.grainDark} text-center text-white`} style={{ background: NAVY, ...grain(0.3) }}>
+      <section id="download" className={`${styles.grainDark} text-center text-white`} style={{ background: NAVY, ...grain(0.18) }}>
         <div className="mx-auto max-w-3xl px-5 py-24 md:py-28">
           <Image src="/zepper/icon@2x.png" alt="" width={96} height={96} className="mx-auto drop-shadow-[0_16px_30px_rgba(0,0,0,0.4)]" />
           <h2 className={`${styles.display} mt-8 text-[2.8rem] font-bold leading-[1] md:text-[4.2rem]`}>
