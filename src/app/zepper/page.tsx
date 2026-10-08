@@ -20,13 +20,15 @@ import { GithubIcon } from "@/components/icons";
 import { siteUrl } from "@/lib/site";
 import { AppleLogo, Check, Sparkle, Wave } from "./art";
 import { LoopVideo } from "./LoopVideo";
+import { MacDownload } from "./MacDownload";
 import { latestRelease, releasesUrl, repoUrl } from "./release";
 import styles from "./zepper.module.css";
 
 // The version shown follows the latest release (checked every few minutes); the buttons go through
-// /zepper/download, which finds the newest .dmg when you click.
+// /zepper/download, which finds the newest .dmg when you click (the Intel one on an Intel Mac).
 export const revalidate = 300;
 const DOWNLOAD = "/zepper/download";
+const DOWNLOAD_INTEL = "/zepper/download?mac=intel";
 
 const display = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-display", axes: ["opsz", "wdth"] });
 const serif = Instrument_Serif({ subsets: ["latin"], weight: "400", style: ["normal", "italic"], variable: "--font-serif" });
@@ -72,10 +74,11 @@ const strip = [
   "Secure DNS",
 ];
 
-const facts = [
+/** `intel`: the latest release has a build for Intel Macs too. */
+const facts = (intel: boolean) => [
   ["Free and open source", "GPL-3.0, no account needed"],
   ["Built on Chromium", "Sites work as they do in Chrome"],
-  ["Native on Apple silicon", "macOS 14 or later"],
+  intel ? ["Apple silicon and Intel", "Native on both, macOS 14 or later"] : ["Native on Apple silicon", "macOS 14 or later"],
   ["Updates itself", "Quietly, in the background"],
 ];
 
@@ -103,9 +106,14 @@ const more = [
   { icon: RotateCcw, title: "Right where you left it", text: "Every window, space and tab comes back when you reopen Zepper." },
 ];
 
-const faq = [
+const faq = (intel: boolean) => [
   ["Is Zepper free?", "Yes. It's free and open source under the GPL-3.0. There's no account to make and nothing to pay for."],
-  ["Which Macs does it run on?", "Macs with Apple silicon, on macOS 14 or later."],
+  [
+    "Which Macs does it run on?",
+    intel
+      ? "Any Mac on macOS 14 or later, with Apple silicon or Intel: the download button gets the right one for yours. Translate and summarise use Apple Intelligence, so they need a Mac with Apple silicon."
+      : "Macs with Apple silicon, on macOS 14 or later.",
+  ],
   [
     "Why does macOS stop it the first time?",
     "Zepper isn't notarized by Apple yet. The first time you open it, go to System Settings › Privacy & Security and click Open Anyway. After that it opens like any other app, and updates install themselves.",
@@ -225,21 +233,40 @@ function Feature({
   );
 }
 
-function DownloadButton({ href }: { href: string }) {
+function DownloadButton({ intel }: { intel: boolean }) {
   return (
-    <a
-      href={href}
+    <MacDownload
+      href={DOWNLOAD}
+      intelHref={intel ? DOWNLOAD_INTEL : null}
       className="inline-flex items-center gap-2.5 rounded-full bg-white px-6 py-3.5 text-[1rem] font-semibold text-[#18245f] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] transition hover:bg-[#eef1ff]"
     >
       <AppleLogo className="h-[18px] w-[18px] -translate-y-px" />
       Download for Mac
-    </a>
+    </MacDownload>
+  );
+}
+
+/** The other build, for when the button guessed wrong (or you're downloading for another Mac). */
+function OtherMacs({ className }: { className: string }) {
+  return (
+    <span className={className}>
+      Also for{" "}
+      <a href={DOWNLOAD_INTEL} className="underline underline-offset-4 hover:text-white">
+        Intel Macs
+      </a>{" "}
+      and{" "}
+      <a href={DOWNLOAD} className="underline underline-offset-4 hover:text-white">
+        Apple silicon
+      </a>
+    </span>
   );
 }
 
 export default async function ZepperPage() {
   const release = await latestRelease();
-  const meta = [release.version ? `Version ${release.version}` : null, "Apple silicon", "macOS 14 or later"].filter(Boolean).join(" · ");
+  const intel = release.intelUrl !== null;
+  const macs = intel ? "Apple silicon and Intel" : "Apple silicon";
+  const meta = [release.version ? `Version ${release.version}` : null, macs, "macOS 14 or later"].filter(Boolean).join(" · ");
   const grain = (amount: number) => ({ ["--grain" as string]: amount }) as React.CSSProperties;
   // How far the hero's window reaches up into the navy (the rest sits on the cream below).
   const overlap = "clamp(170px, 28vw, 400px)";
@@ -290,13 +317,14 @@ export default async function ZepperPage() {
               GitHub
             </a>
           </nav>
-          <a
+          <MacDownload
             href={DOWNLOAD}
+            intelHref={intel ? DOWNLOAD_INTEL : null}
             className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#18245f] transition hover:bg-[#eef1ff]"
           >
             <AppleLogo className="h-3.5 w-3.5 -translate-y-px" />
             Download
-          </a>
+          </MacDownload>
         </header>
 
         <div className="mx-auto max-w-4xl px-5 pb-10 pt-6 text-center md:pt-8">
@@ -321,7 +349,7 @@ export default async function ZepperPage() {
             the very first page.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <DownloadButton href={DOWNLOAD} />
+            <DownloadButton intel={intel} />
             <a
               href={repoUrl}
               className="inline-flex items-center gap-2.5 rounded-full px-6 py-3.5 font-semibold text-white ring-1 ring-white/25 transition hover:bg-white/[0.06] hover:ring-white/40"
@@ -336,7 +364,8 @@ export default async function ZepperPage() {
                 What&apos;s new in {release.version}
               </a>
             ) : null}
-            {release.version ? " · " : ""}Apple silicon · macOS 14 or later
+            {release.version ? " · " : ""}
+            {macs} · macOS 14 or later
           </p>
         </div>
         <div style={{ height: overlap }} />
@@ -349,7 +378,7 @@ export default async function ZepperPage() {
             <WindowClip name="showcase" label="Zepper in one take: Tidy sorting a messy space, the command bar opening Mount Fuji with a bang, split view, compact mode and a swipe to another space" width={1920} height={1200} />
           </div>
           <dl className="mx-auto grid max-w-6xl grid-cols-2 gap-x-6 gap-y-8 px-5 pb-16 pt-14 md:grid-cols-4 md:pt-16">
-            {facts.map(([fact, detail]) => (
+            {facts(intel).map(([fact, detail]) => (
               <div key={fact} className="border-l-2 border-[#18245f]/15 pl-4">
                 <dt className="font-semibold text-[#18245f]">{fact}</dt>
                 <dd className="mt-1 text-sm text-[#111633]/60">{detail}</dd>
@@ -607,7 +636,7 @@ export default async function ZepperPage() {
                 </p>
               </div>
               <dl className="divide-y divide-[#111633]/10 border-y border-[#111633]/10">
-                {faq.map(([question, answer]) => (
+                {faq(intel).map(([question, answer]) => (
                   <div key={question} className="py-6">
                     <dt className="font-semibold text-[#111633]">{question}</dt>
                     <dd className="mt-2 leading-relaxed text-[#111633]/65">{answer}</dd>
@@ -631,9 +660,10 @@ export default async function ZepperPage() {
             about a minute.
           </p>
           <div className="mt-10 flex justify-center">
-            <DownloadButton href={DOWNLOAD} />
+            <DownloadButton intel={intel} />
           </div>
           <p className="mt-5 text-sm text-white/50">{meta}</p>
+          {intel ? <OtherMacs className="mt-1.5 block text-sm text-white/50" /> : null}
           <ol className="mx-auto mt-14 grid max-w-3xl gap-4 text-left sm:grid-cols-3">
             {[
               ["Install", "Open the .dmg and drag Zepper into Applications."],
