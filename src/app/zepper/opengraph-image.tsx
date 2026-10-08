@@ -4,7 +4,7 @@ import { ImageResponse } from "next/og";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "Zepper, a calm browser for your Mac";
+export const alt = "Zepper, a private browser for your Mac";
 
 export default async function OgImage() {
   const icon = await readFile(join(process.cwd(), "public/zepper/icon@2x.png"));
@@ -27,7 +27,7 @@ export default async function OgImage() {
       >
         <img src={src} width={168} height={168} alt="" />
         <div style={{ display: "flex", marginTop: 36, fontSize: 84, fontWeight: 700, letterSpacing: "-0.04em" }}>
-          A calm browser for your Mac.
+          Tabs in their place. Trackers out of it.
         </div>
         <div style={{ display: "flex", marginTop: 22, fontSize: 32, color: "#a1a1aa" }}>
           Spaces, a vertical sidebar and privacy on from the start.

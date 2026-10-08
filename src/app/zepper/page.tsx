@@ -38,7 +38,7 @@ import { latestRelease, releasesUrl, repoUrl } from "./release";
 // The download button follows the latest release: the page is rebuilt at most hourly.
 export const revalidate = 3600;
 
-const title = "Zepper · A calm, private browser for Mac";
+const title = "Zepper · A private browser for your Mac";
 const description =
   "Zepper is a free, open-source browser for macOS: Spaces, a vertical sidebar, split view and privacy protections that are on from the start. Built on Chromium, made to be changed.";
 
@@ -294,9 +294,9 @@ export default async function ZepperPage() {
               <ArrowRight className="h-3 w-3 text-zinc-500" />
             </a>
             <h1 className="fade-up mx-auto mt-7 max-w-4xl bg-gradient-to-b from-white via-white to-[#b9c8ff]/70 bg-clip-text text-5xl font-semibold leading-[1.02] tracking-[-0.045em] text-transparent sm:text-6xl md:text-7xl">
-              A calm browser
+              Tabs in their place.
               <br />
-              for your Mac.
+              Trackers out of it.
             </h1>
             <p className="fade-up mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-zinc-400 md:text-xl">
               Spaces, a vertical sidebar and privacy that&apos;s on from the start. Built on Chromium, made to be changed.
