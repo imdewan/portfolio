@@ -70,7 +70,7 @@ const strip = [
   "Bangs",
   "Memory Saver",
   "Chrome extensions",
-  "Netflix and Spotify",
+  "Widevine support",
   "Secure DNS",
 ];
 
@@ -98,7 +98,7 @@ const more = [
   { icon: FolderTree, title: "Pinned tabs and folders", text: "Tabs that stay, sorted into folders you can nest." },
   { icon: KeyRound, title: "Passwords and passkeys", text: "Built in, encrypted on your Mac, unlocked with Touch ID." },
   { icon: PictureInPicture2, title: "Picture in picture", text: "Leave a playing video and it comes with you." },
-  { icon: Clapperboard, title: "Netflix and Spotify", text: "Widevine for streaming, whenever you turn it on." },
+  { icon: Clapperboard, title: "Widevine support", text: "Protected video and music from streaming sites, whenever you turn it on." },
   { icon: Gauge, title: "Memory Saver", text: "Tabs you haven't looked at in hours give their memory back." },
   { icon: Puzzle, title: "Chrome extensions", text: "Install them straight from the Chrome Web Store." },
   { icon: Camera, title: "Captures", text: "⇧⌘2 copies an element, a region or the whole page." },
@@ -123,7 +123,7 @@ const faq = (intel: boolean) => [
     "Yes. A short setup on first launch brings them over from Chrome, Brave, Edge, Arc, Firefox, Safari and others, or from 1Password and Bitwarden exports.",
   ],
   ["Do Chrome extensions work?", "Yes. Install them from the Chrome Web Store, as you would in Chrome."],
-  ["Does Netflix work?", "Yes. Turn on Widevine in Settings › Media, or accept the prompt when a streaming site asks for it."],
+  ["Do streaming sites work?", "Yes. Zepper has Widevine support: turn it on in Settings › Media, or accept the prompt when a streaming site asks for it."],
 ];
 
 const spaceShots = [
