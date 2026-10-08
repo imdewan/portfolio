@@ -241,8 +241,6 @@ export default async function ZepperPage() {
   const release = await latestRelease();
   const meta = [release.version ? `Version ${release.version}` : null, "Apple silicon", "macOS 14 or later"].filter(Boolean).join(" · ");
   const grain = (amount: number) => ({ ["--grain" as string]: amount }) as React.CSSProperties;
-  // How far the hero's window reaches up into the navy (the rest sits on the cream below).
-  const overlap = "clamp(170px, 28vw, 400px)";
 
   return (
     <div
@@ -339,13 +337,11 @@ export default async function ZepperPage() {
             {release.version ? " · " : ""}Apple silicon · macOS 14 or later
           </p>
         </div>
-        <div style={{ height: overlap }} />
+        {/* The window sits on the navy; the cream starts below it. */}
+        <div className="mx-auto max-w-6xl px-4 pb-20 md:px-5 md:pb-24">
+          <WindowClip name="tour-window" label="Zepper's sidebar: Essentials, pinned tabs and a folder, clicking between pages" width={1920} height={1200} />
+        </div>
       </section>
-
-      {/* The window, from the navy onto the cream. */}
-      <div className="relative z-10 mx-auto max-w-6xl px-4 md:px-5" style={{ marginTop: `calc(-1 * ${overlap})` }}>
-        <WindowClip name="tour-window" label="Zepper's sidebar: Essentials, pinned tabs and a folder, clicking between pages" width={1920} height={1200} />
-      </div>
 
       <div className={styles.grain} style={grain(0.22)}>
         <div>
