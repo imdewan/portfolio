@@ -1,46 +1,42 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { Bricolage_Grotesque, Caveat, Instrument_Serif } from "next/font/google";
 import {
-  ArrowRight,
-  Ban,
-  Check,
-  CalendarDays,
-  Columns2,
-  Command,
-  Cookie,
-  Download,
-  EyeOff,
-  Fingerprint,
+  Apple,
+  Camera,
+  Clapperboard,
+  FolderTree,
   Gauge,
-  Globe,
   KeyRound,
-  Layers,
-  Link2,
-  Lock,
-  Mail,
-  MessageCircle,
-  Music,
-  Network,
-  PanelLeft,
-  PenTool,
+  Languages,
   PictureInPicture2,
-  Play,
-  ShieldCheck,
-  Sparkles,
-  Wrench,
+  Puzzle,
+  RotateCcw,
+  SquareStack,
 } from "lucide-react";
 import { JsonLd } from "@/components/JsonLd";
 import { GithubIcon } from "@/components/icons";
 import { siteUrl } from "@/lib/site";
+import { Arrow, Sparkle, Squiggle, Stamp, Tick, Wave } from "./art";
+import { LoopVideo } from "./LoopVideo";
 import { latestRelease, releasesUrl, repoUrl } from "./release";
+import styles from "./zepper.module.css";
 
 // The download button follows the latest release: the page is rebuilt at most hourly.
 export const revalidate = 3600;
 
+const display = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-display", axes: ["opsz", "wdth"] });
+const serif = Instrument_Serif({ subsets: ["latin"], weight: "400", style: ["normal", "italic"], variable: "--font-serif" });
+const hand = Caveat({ subsets: ["latin"], variable: "--font-hand" });
+
+const BLUE = "#2747d6";
+const NAVY = "#141b4d";
+const CREAM = "#fbf4e4";
+
 const title = "Zepper · A private browser for your Mac";
 const description =
-  "Zepper is a free, open-source browser for macOS: Spaces, a vertical sidebar, split view and privacy protections that are on from the start. Built on Chromium, made to be changed.";
+  "Zepper is a free, open-source browser for macOS: Spaces, a sidebar built for tabs, split view and privacy protections that are on from the first page. Built on Chromium, made to be changed.";
 
 export const metadata: Metadata = {
   title: { absolute: title },
@@ -54,166 +50,161 @@ export const metadata: Metadata = {
     description,
     url: "/zepper",
     locale: "en_US",
+    images: [{ url: "/zepper/og.png", width: 1200, height: 630, alt: "Zepper: tabs in their place, trackers out of it" }],
   },
-  twitter: { card: "summary_large_image", creator: "@mrdsa04", title, description },
+  twitter: { card: "summary_large_image", creator: "@mrdsa04", title, description, images: ["/zepper/og.png"] },
 };
 
-const pillars = [
-  {
-    icon: Layers,
-    title: "Built around tabs",
-    text: "Spaces for each part of your life, a vertical sidebar with Essentials, pinned tabs and folders, and split view for up to four pages.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Private by default",
-    text: "Ads, trackers and cookie banners blocked, fingerprinting noise, HTTPS upgrades and clean links. All on before you open a page.",
-  },
-  {
-    icon: Wrench,
-    title: "Yours to change",
-    text: "The whole interface is TypeScript, React and CSS. Fork it, restyle it, add to it; changes show the moment you save.",
-  },
+const strip = [
+  "Spaces",
+  "Split view",
+  "Essentials",
+  "Ad blocking",
+  "Passkeys",
+  "Picture in picture",
+  "Command bar",
+  "Bangs",
+  "Memory Saver",
+  "Chrome extensions",
+  "Netflix & Spotify",
+  "Secure DNS",
 ];
 
 const protections = [
-  { icon: Ban, title: "Ads and trackers", text: "uBlock Origin's filter lists, YouTube ads included" },
-  { icon: Cookie, title: "Cookie banners", text: "Hidden with uBlock Origin's annoyance lists" },
-  { icon: Fingerprint, title: "Fingerprinting", text: "Per-site noise on canvas, WebGL and audio; no local IP leaks" },
-  { icon: EyeOff, title: "Cross-site cookies", text: "Embedded third parties can't set or read them" },
-  { icon: Lock, title: "HTTPS upgrades", text: "Plain-HTTP pages load securely when the site supports it" },
-  { icon: Link2, title: "Clean links", text: "Click identifiers like fbclid and gclid, and AMP wrappers, removed" },
-  { icon: Network, title: "Secure DNS", text: "DNS over HTTPS, automatic or through Cloudflare, Quad9 or Google" },
-  { icon: Globe, title: "Global Privacy Control", text: "Asks every site not to sell or share your data" },
+  ["Ads and trackers", "uBlock Origin's lists, YouTube ads included"],
+  ["Cookie banners", "Hidden before they get in the way"],
+  ["Fingerprinting", "A little noise on canvas, WebGL and audio, per site"],
+  ["Cross-site cookies", "Embedded third parties can't follow you"],
+  ["HTTPS upgrades", "Plain-HTTP pages load securely when they can"],
+  ["Clean links", "fbclid, gclid and AMP wrappers, gone"],
+  ["Secure DNS", "DNS over HTTPS through Cloudflare, Quad9 or Google"],
+  ["Global Privacy Control", "Asks every site not to sell your data"],
 ];
 
-const spaces = [
-  { name: "Personal", emoji: "🌸", from: "#f6a4c8", to: "#b18cf6" },
-  { name: "Work", emoji: "💼", from: "#7b6cf6", to: "#5f86f5" },
-  { name: "Reading", emoji: "📚", from: "#e07a2d", to: "#f2b134" },
+const more = [
+  { icon: SquareStack, color: "#ffd166", title: "Essentials", text: "Your most-used sites a click away, signed in with each space's accounts." },
+  { icon: FolderTree, color: "#b9d8ff", title: "Pinned tabs and folders", text: "Tabs that stay, sorted into folders you can nest." },
+  { icon: KeyRound, color: "#ffb4a2", title: "Passwords and passkeys", text: "Built in, encrypted on your Mac, unlocked with Touch ID." },
+  { icon: PictureInPicture2, color: "#c7f0d8", title: "Picture in picture", text: "Leave a playing video and it follows you." },
+  { icon: Clapperboard, color: "#e3d4ff", title: "Netflix and Spotify", text: "Widevine for streaming, whenever you want it." },
+  { icon: Gauge, color: "#ffd166", title: "Memory Saver", text: "Tabs you haven't looked at in hours give their memory back." },
+  { icon: Puzzle, color: "#b9d8ff", title: "Chrome extensions", text: "Straight from the Chrome Web Store." },
+  { icon: Camera, color: "#ffb4a2", title: "Captures", text: "⇧⌘2: an element, a region or the whole page, copied." },
+  { icon: Languages, color: "#c7f0d8", title: "Translate and summarise", text: "On Macs with Apple Intelligence, without leaving your computer." },
+  { icon: RotateCcw, color: "#e3d4ff", title: "Right where you left it", text: "Every window, space and tab comes back when you reopen Zepper." },
 ];
 
-const essentials = [
-  { icon: Mail, color: "#ea4335" },
-  { icon: Play, color: "#ff3b30" },
-  { icon: PenTool, color: "#a259ff" },
-  { icon: CalendarDays, color: "#4285f4" },
-  { icon: Music, color: "#1db954" },
-  { icon: MessageCircle, color: "#7984f6" },
+const spaceCards = [
+  { name: "Personal", emoji: "🌸", from: "#c4bfdc", via: "#e2cdd3", to: "#f0dfd0", ink: "#3b3550", tilt: "-7deg", x: "0%", y: "6%", tabs: ["Hacker News", "The Verge", "Aurora · Wikipedia"] },
+  { name: "Work", emoji: "💼", from: "#3fb6a8", via: "#4f7fe0", to: "#8a5cf0", ink: "#ffffff", tilt: "2deg", x: "26%", y: "0%", tabs: ["electron/electron", "Next.js", "Tailwind CSS"] },
+  { name: "Reading", emoji: "📚", from: "#e07a2d", via: "#e9963a", to: "#f2b134", ink: "#3a1d05", tilt: "9deg", x: "52%", y: "10%", tabs: ["Mount Fuji", "National Geographic", "Northern Lights"] },
 ];
+
+/** A recording in a print frame, a little crooked. */
+function Print({
+  name,
+  label,
+  tilt = "-1.2deg",
+  width = 1920,
+  height = 1242,
+  className = "",
+}: {
+  name: string;
+  label: string;
+  tilt?: string;
+  width?: number;
+  height?: number;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`${styles.print} rounded-[26px] bg-[#fffaf0] p-2 shadow-[0_40px_80px_-30px_rgba(20,24,58,0.55),0_0_0_1px_rgba(20,24,58,0.06)] md:p-2.5 ${className}`}
+      style={{ transform: `rotate(${tilt})` }}
+    >
+      <LoopVideo
+        src={`/zepper/video/${name}.mp4`}
+        poster={`/zepper/video/${name}.jpg`}
+        width={width}
+        height={height}
+        label={label}
+        className="block h-auto w-full rounded-[19px] bg-[#e9e3f0]"
+      />
+    </div>
+  );
+}
+
+function Note({ children, className = "", color = "#ff7a59" }: { children: React.ReactNode; className?: string; color?: string }) {
+  return (
+    <p className={`${styles.hand} text-2xl leading-none md:text-[1.7rem] ${className}`} style={{ color }}>
+      {children}
+    </p>
+  );
+}
+
+function Heading({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return (
+    <h2 className={`${styles.display} mt-3 text-[2.6rem] font-extrabold leading-[0.95] md:text-[3.6rem] ${className}`}>{children}</h2>
+  );
+}
+
+function Feature({
+  note,
+  title: heading,
+  children,
+  video,
+  label,
+  reverse = false,
+  tilt,
+}: {
+  note: string;
+  title: string;
+  children: React.ReactNode;
+  video: string;
+  label: string;
+  reverse?: boolean;
+  tilt: string;
+}) {
+  return (
+    <section className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-16 md:grid-cols-[0.82fr_1.18fr] md:gap-16 md:py-24">
+      <div className={reverse ? "md:order-2" : ""}>
+        <Note className="-rotate-2">{note}</Note>
+        <Heading className="text-[#2747d6]">{heading}</Heading>
+        <p className="mt-5 max-w-md text-lg leading-relaxed text-[#14183a]/75">{children}</p>
+      </div>
+      <Print name={video} label={label} tilt={tilt} className={reverse ? "md:order-1" : ""} />
+    </section>
+  );
+}
 
 function Kbd({ children }: { children: React.ReactNode }) {
   return (
-    <kbd className="inline-flex min-w-[1.6rem] items-center justify-center rounded-md border border-white/15 bg-white/[0.06] px-1.5 py-0.5 font-sans text-[0.8em] font-medium text-zinc-200 shadow-[inset_0_-1px_0_rgba(255,255,255,0.08)]">
+    <kbd className="mx-0.5 inline-flex min-w-[1.7em] items-center justify-center rounded-md border border-[#14183a]/20 bg-white px-1.5 py-px font-sans text-[0.85em] font-semibold text-[#14183a] shadow-[0_2px_0_rgba(20,24,58,0.18)]">
       {children}
     </kbd>
   );
 }
 
-function IconChip({ icon: Icon }: { icon: typeof Layers }) {
+function DownloadButton({ href }: { href: string }) {
   return (
-    <span className="grid h-9 w-9 place-items-center rounded-xl border border-[#5f86f5]/25 bg-[#5f86f5]/10 text-[#9db4ff]">
-      <Icon className="h-[18px] w-[18px]" strokeWidth={1.8} />
-    </span>
-  );
-}
-
-function Card({
-  className = "",
-  icon,
-  title,
-  children,
-  visual,
-}: {
-  className?: string;
-  icon: typeof Layers;
-  title: string;
-  children: React.ReactNode;
-  visual?: React.ReactNode;
-}) {
-  return (
-    <div
-      className={`group relative flex flex-col overflow-hidden rounded-3xl border border-white/[0.08] bg-gradient-to-b from-white/[0.05] to-white/[0.015] p-6 transition-colors hover:border-white/[0.14] ${className}`}
+    <a
+      href={href}
+      className="inline-flex items-center gap-2.5 rounded-full border-2 border-[#14183a] bg-[#ffd166] px-7 py-3.5 text-[1.02rem] font-bold text-[#14183a] shadow-[4px_5px_0_#14183a] transition-all hover:-translate-y-0.5 hover:shadow-[5px_7px_0_#14183a] active:translate-y-0.5 active:shadow-[2px_2px_0_#14183a]"
     >
-      <IconChip icon={icon} />
-      <h3 className="mt-5 text-lg font-semibold tracking-tight text-zinc-50">{title}</h3>
-      <p className="mt-2 text-[0.95rem] leading-relaxed text-zinc-400">{children}</p>
-      {visual ? <div className="mt-6 flex flex-1 items-end">{visual}</div> : null}
-    </div>
-  );
-}
-
-function SpacesVisual() {
-  return (
-    <div className="flex w-full flex-wrap gap-2.5">
-      {spaces.map((space) => (
-        <div
-          key={space.name}
-          className="flex items-center gap-2.5 rounded-2xl border border-white/10 px-3.5 py-2.5 text-sm text-white"
-          style={{ background: `linear-gradient(135deg, ${space.from}40, ${space.to}26)` }}
-        >
-          <span
-            className="grid h-7 w-7 place-items-center rounded-lg text-sm"
-            style={{ background: `linear-gradient(135deg, ${space.from}, ${space.to})` }}
-          >
-            {space.emoji}
-          </span>
-          {space.name}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function EssentialsVisual() {
-  return (
-    <div className="grid w-full grid-cols-3 gap-2">
-      {essentials.map(({ icon: Icon, color }) => (
-        <div key={color} className="grid h-12 place-items-center rounded-xl bg-white/[0.07]" style={{ color }}>
-          <Icon className="h-5 w-5" strokeWidth={2} fill={Icon === Play ? color : "none"} />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function SplitVisual() {
-  return (
-    <div className="grid h-28 w-full grid-cols-2 grid-rows-2 gap-1.5 rounded-2xl border border-white/10 bg-black/30 p-1.5">
-      <div className="row-span-2 rounded-xl bg-gradient-to-br from-[#5f86f5]/35 to-[#5f86f5]/10" />
-      <div className="rounded-xl bg-white/[0.08]" />
-      <div className="rounded-xl bg-white/[0.05]" />
-    </div>
-  );
-}
-
-function CommandVisual() {
-  return (
-    <div className="w-full overflow-hidden rounded-2xl border border-white/10 bg-black/40 text-sm">
-      <div className="flex items-center gap-2 border-b border-white/[0.08] px-3.5 py-3 text-zinc-200">
-        <Command className="h-4 w-4 text-zinc-500" />
-        <span>
-          !gh electron<span className="ml-0.5 inline-block h-4 w-px translate-y-0.5 animate-pulse bg-[#9db4ff]" />
-        </span>
-      </div>
-      <div className="flex items-center justify-between gap-3 bg-[#5f86f5]/20 px-3.5 py-2.5 text-zinc-100">
-        <span className="truncate">electron · GitHub search</span>
-        <span className="shrink-0 text-xs text-zinc-400">github.com</span>
-      </div>
-      <div className="flex items-center justify-between gap-3 px-3.5 py-2.5 text-zinc-400">
-        <span className="truncate">electron/electron</span>
-        <span className="shrink-0 rounded-md bg-white/[0.07] px-2 py-0.5 text-xs">Switch to Tab</span>
-      </div>
-    </div>
+      <Apple className="h-5 w-5 -translate-y-px" fill="currentColor" strokeWidth={0} />
+      Download for Mac
+    </a>
   );
 }
 
 export default async function ZepperPage() {
   const release = await latestRelease();
-  const versionLabel = release.version ? `Version ${release.version}` : "Latest version";
+  const meta = [release.version ? `Version ${release.version}` : null, "Apple silicon", "macOS 14 or later"].filter(Boolean).join(" · ");
+  const grain = (amount: number) => ({ ["--grain" as string]: amount }) as React.CSSProperties;
 
   return (
-    <div className="min-h-screen overflow-x-clip bg-[#06080d] text-zinc-100 selection:bg-[#5f86f5]/40">
+    <div
+      className={`${display.variable} ${serif.variable} ${hand.variable} min-h-screen overflow-x-clip bg-[#fbf4e4] font-sans text-[#14183a] selection:bg-[#ffd166] selection:text-[#14183a]`}
+    >
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -231,331 +222,391 @@ export default async function ZepperPage() {
         }}
       />
 
-      {/* Navigation */}
-      <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#06080d]/70 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5">
-          <Link href="/zepper" className="flex items-center gap-2.5 font-semibold tracking-tight">
-            <Image src="/zepper/icon.png" alt="" width={30} height={30} className="rounded-[9px]" priority />
+      {/* Hero */}
+      <section className={`${styles.grain} text-[#fbf4e4]`} style={{ background: BLUE, ...grain(0.7) }}>
+        <header className="mx-auto flex max-w-6xl items-center justify-between px-5 py-5">
+          <Link href="/zepper" className={`${styles.display} flex items-center gap-2.5 text-xl font-extrabold`}>
+            <Image src="/zepper/icon.png" alt="" width={34} height={34} className={`${styles.wobble} rounded-[10px]`} priority />
             Zepper
           </Link>
-          <nav className="hidden items-center gap-7 text-sm text-zinc-400 md:flex" aria-label="Zepper">
-            <a href="#features" className="transition-colors hover:text-zinc-100">
+          <nav className="hidden items-center gap-8 text-[0.95rem] font-medium text-[#fbf4e4]/80 md:flex" aria-label="Zepper">
+            <a href="#spaces" className="hover:text-white">
               Features
             </a>
-            <a href="#privacy" className="transition-colors hover:text-zinc-100">
+            <a href="#privacy" className="hover:text-white">
               Privacy
             </a>
-            <a href="#make-it-yours" className="transition-colors hover:text-zinc-100">
+            <a href="#make-it-yours" className="hover:text-white">
               Make it yours
             </a>
-            <a href={repoUrl} className="flex items-center gap-1.5 transition-colors hover:text-zinc-100">
+            <a href={repoUrl} className="flex items-center gap-1.5 hover:text-white">
               <GithubIcon className="h-4 w-4" />
               GitHub
             </a>
           </nav>
           <a
             href={release.downloadUrl}
-            className="inline-flex items-center gap-2 rounded-full bg-[#5f86f5] px-4 py-2 text-sm font-medium text-white shadow-[0_6px_20px_-6px_rgba(95,134,245,0.8)] transition hover:bg-[#6f93f7]"
+            className="rounded-full bg-[#fbf4e4] px-4 py-2 text-sm font-bold text-[#2747d6] transition-transform hover:-translate-y-px"
           >
-            <Download className="h-4 w-4" />
             Download
           </a>
+        </header>
+
+        <div className="relative mx-auto max-w-5xl px-5 pb-14 pt-14 text-center md:pt-20">
+          <Stamp className="absolute right-2 top-0 hidden w-28 rotate-12 drop-shadow-[0_10px_18px_rgba(10,14,60,0.35)] md:block lg:-right-6 lg:w-32" />
+          <a
+            href={releasesUrl}
+            className="inline-flex items-center gap-2 rounded-full bg-[#fbf4e4]/[0.12] px-3.5 py-1.5 text-sm font-medium text-[#fbf4e4]/90 ring-1 ring-[#fbf4e4]/20 transition-colors hover:bg-[#fbf4e4]/20"
+          >
+            <span className="rounded-full bg-[#ffd166] px-2 py-0.5 text-xs font-bold text-[#14183a]">New</span>
+            {release.version ? `Zepper ${release.version} is out` : "The latest Zepper is out"}
+          </a>
+          <h1 className="mt-8">
+            <span className={`${styles.display} block text-[3.4rem] font-extrabold leading-[0.9] sm:text-7xl md:text-[6.6rem]`}>
+              Tabs in their place.
+            </span>
+            <span className={`${styles.serif} relative mt-1 inline-block text-[3.4rem] leading-[0.95] text-[#fff6dc] sm:text-[4.6rem] md:text-[7rem]`}>
+              Trackers <br className="sm:hidden" />
+              out of it.
+              <Squiggle className="absolute -bottom-3 left-[46%] h-5 w-[52%] md:-bottom-4 md:h-7" />
+            </span>
+          </h1>
+          <p className="mx-auto mt-9 max-w-xl text-lg leading-relaxed text-[#fbf4e4]/80 md:text-xl">
+            A free, open-source browser for your Mac, with Spaces, a sidebar built for tabs, and privacy that&apos;s on
+            from the very first page.
+          </p>
+          <div className="mt-10 flex flex-col items-center justify-center gap-5 sm:flex-row">
+            <DownloadButton href={release.downloadUrl} />
+            <a href={repoUrl} className="flex items-center gap-2 font-semibold text-[#fbf4e4] underline-offset-4 hover:underline">
+              <GithubIcon className="h-5 w-5" />
+              or read the source
+            </a>
+          </div>
+          <p className="mt-6 text-sm text-[#fbf4e4]/60">{meta}</p>
         </div>
-      </header>
+
+        <div className="relative mx-auto max-w-6xl px-4 pb-20 md:px-5 md:pb-28">
+          <div className="pointer-events-none absolute -left-32 top-10 z-10 hidden w-36 -rotate-6 xl:block">
+            <Note color="#ffd166" className="text-center">
+              three spaces,
+              <br />
+              one window
+            </Note>
+            <Arrow className="ml-16 mt-1 h-16 w-24" />
+          </div>
+          <Print name="spaces" label="Switching between three spaces in Zepper, each with its own colours and tabs" tilt="-1deg" />
+        </div>
+      </section>
+
+      {/* Strip of features */}
+      <div style={{ background: BLUE }}>
+        <Wave color={CREAM} />
+      </div>
+      <div className={`${styles.marqueeTrack} overflow-hidden border-b-2 border-dashed border-[#14183a]/15 py-5`}>
+        <div className={styles.marquee}>
+          {[0, 1].map((copy) => (
+            <div key={copy} className="flex shrink-0 items-center" aria-hidden={copy === 1}>
+              {strip.map((item) => (
+                <span key={item} className={`${styles.display} flex items-center whitespace-nowrap text-2xl font-bold text-[#2747d6] md:text-3xl`}>
+                  <span className="px-6">{item}</span>
+                  <Sparkle className="h-5 w-5 text-[#ff7a59]" />
+                </span>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
 
       <main>
-        {/* Hero */}
-        <section className="relative">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-x-0 -top-40 h-[720px] bg-[radial-gradient(50%_55%_at_50%_30%,rgba(95,134,245,0.32),transparent_70%)]"
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(60%_50%_at_50%_20%,black,transparent)]"
-          />
-          <div className="relative mx-auto max-w-6xl px-5 pb-10 pt-20 text-center md:pt-28">
-            <div className="fade-up mx-auto mb-8 w-fit">
-              <Image
-                src="/zepper/icon@2x.png"
-                alt="Zepper"
-                width={112}
-                height={112}
-                priority
-                className="mx-auto drop-shadow-[0_18px_40px_rgba(95,134,245,0.45)]"
-              />
-            </div>
-            <a
-              href={releasesUrl}
-              className="fade-up inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1.5 text-xs text-zinc-300 transition-colors hover:border-white/20"
-            >
-              <span className="h-1.5 w-1.5 rounded-full bg-[#7ea0ff] shadow-[0_0_10px_#7ea0ff]" />
-              {versionLabel} · Free and open source
-              <ArrowRight className="h-3 w-3 text-zinc-500" />
-            </a>
-            <h1 className="fade-up mx-auto mt-7 max-w-4xl bg-gradient-to-b from-white via-white to-[#b9c8ff]/70 bg-clip-text text-5xl font-semibold leading-[1.02] tracking-[-0.045em] text-transparent sm:text-6xl md:text-7xl">
-              Tabs in their place.
-              <br />
-              Trackers out of it.
-            </h1>
-            <p className="fade-up mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-zinc-400 md:text-xl">
-              Spaces, a vertical sidebar and privacy that&apos;s on from the start. Built on Chromium, made to be changed.
+        {/* Spaces */}
+        <section id="spaces" className="mx-auto grid max-w-6xl scroll-mt-6 items-center gap-12 px-5 py-20 md:grid-cols-2 md:py-28">
+          <div>
+            <Note className="-rotate-2">for work, for you, for later</Note>
+            <Heading className="text-[#2747d6]">A space for every side of you.</Heading>
+            <p className="mt-5 max-w-md text-lg leading-relaxed text-[#14183a]/75">
+              Each space keeps its own colours, pinned tabs and Essentials, and if you like, its own sign-ins, kept apart
+              like separate profiles. Swipe between them on the trackpad, or press <Kbd>⌃1</Kbd>
+              <Kbd>⌃2</Kbd>
+              <Kbd>⌃3</Kbd>.
             </p>
-            <div className="fade-up mt-9 flex flex-wrap items-center justify-center gap-3">
-              <a
-                href={release.downloadUrl}
-                className="inline-flex items-center gap-2.5 rounded-full bg-[#5f86f5] px-6 py-3.5 text-[0.95rem] font-medium text-white shadow-[0_12px_40px_-10px_rgba(95,134,245,0.9)] transition hover:bg-[#6f93f7]"
-              >
-                <Download className="h-[18px] w-[18px]" />
-                Download for Mac
-              </a>
-              <a
-                href={repoUrl}
-                className="inline-flex items-center gap-2.5 rounded-full border border-white/15 bg-white/[0.04] px-6 py-3.5 text-[0.95rem] font-medium text-zinc-100 transition hover:border-white/25 hover:bg-white/[0.07]"
-              >
-                <GithubIcon className="h-[18px] w-[18px]" />
-                View the source
-              </a>
-            </div>
-            <p className="fade-up mt-5 text-sm text-zinc-500">Apple silicon · macOS 14 or later</p>
           </div>
-
-          {/* Screenshot */}
-          <div className="relative mx-auto max-w-6xl px-5 pb-8">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-x-10 top-16 h-2/3 rounded-full bg-[#5f86f5]/25 blur-[100px]"
-            />
-            <div className="relative rounded-[28px] border border-white/10 bg-white/[0.04] p-2 shadow-[0_50px_120px_-30px_rgba(0,0,0,0.9)] md:p-3">
-              <Image
-                src="/zepper/screenshot.webp"
-                alt="Zepper with its sidebar of Essentials, a space, pinned tabs in a folder, and a page open"
-                width={1800}
-                height={1165}
-                priority
-                sizes="(min-width: 1152px) 1100px, 100vw"
-                className="h-auto w-full rounded-[20px]"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* Pillars */}
-        <section className="mx-auto max-w-6xl px-5 py-20">
-          <div className="grid gap-4 md:grid-cols-3">
-            {pillars.map((pillar) => (
-              <div key={pillar.title} className="rounded-3xl border border-white/[0.07] bg-white/[0.02] p-7">
-                <IconChip icon={pillar.icon} />
-                <h2 className="mt-5 text-xl font-semibold tracking-tight text-zinc-50">{pillar.title}</h2>
-                <p className="mt-2.5 leading-relaxed text-zinc-400">{pillar.text}</p>
+          <div className="relative mx-auto h-[330px] w-full max-w-[520px] md:h-[380px]" aria-hidden>
+            {spaceCards.map((card) => (
+              <div
+                key={card.name}
+                className="absolute w-[46%] rounded-[28px] p-4 shadow-[0_24px_50px_-20px_rgba(20,24,58,0.55)] ring-1 ring-black/5 transition-transform duration-500 hover:z-10"
+                style={{
+                  left: card.x,
+                  top: card.y,
+                  transform: `rotate(${card.tilt})`,
+                  background: `linear-gradient(150deg, ${card.from}, ${card.via} 55%, ${card.to})`,
+                  color: card.ink,
+                }}
+              >
+                <div className="flex items-center gap-2 text-sm font-bold">
+                  <span className="grid h-8 w-8 place-items-center rounded-xl bg-white/35 text-base">{card.emoji}</span>
+                  {card.name}
+                </div>
+                <div className="mt-4 grid grid-cols-3 gap-1.5">
+                  {[0, 1, 2].map((i) => (
+                    <div key={i} className="h-9 rounded-xl bg-white/30" />
+                  ))}
+                </div>
+                <div className="mt-3 space-y-1.5">
+                  {card.tabs.map((tab, i) => (
+                    <div key={tab} className={`flex items-center gap-2 rounded-xl px-2.5 py-2 text-[0.78rem] font-medium ${i === 2 ? "bg-white/55" : ""}`}>
+                      <span className="h-3.5 w-3.5 shrink-0 rounded-[5px] bg-current opacity-40" />
+                      <span className="truncate">{tab}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Features */}
-        <section id="features" className="mx-auto max-w-6xl scroll-mt-20 px-5 py-16">
-          <div className="max-w-2xl">
-            <p className="text-sm font-medium text-[#9db4ff]">Features</p>
-            <h2 className="mt-3 text-4xl font-semibold tracking-[-0.03em] text-zinc-50 md:text-5xl">
-              Everything in its place.
-            </h2>
-            <p className="mt-4 text-lg leading-relaxed text-zinc-400">
-              A browser shaped around how you actually use tabs, with the things you&apos;d expect already built in.
+        <Feature
+          note="press ⌘T"
+          title="Find anything. Go anywhere."
+          video="command"
+          label="Typing a bang in Zepper's command bar and landing on the Wikipedia article"
+          tilt="1.2deg"
+        >
+          One bar for the web, your history and the tabs you already have open. Bangs like <Kbd>!w</Kbd>,{" "}
+          <Kbd>!yt</Kbd> and <Kbd>!gh</Kbd> skip the search page and go straight to the site.
+        </Feature>
+
+        <Feature
+          note="⌥⌘V, ⌥⌘H, ⌥⌘G"
+          title="Two pages, one window."
+          video="split"
+          label="Splitting two tabs side by side, then stacked, in Zepper"
+          reverse
+          tilt="-1.4deg"
+        >
+          Side by side, stacked, or a grid of four, with dividers you can drag. Read the docs while you write the code, then
+          put it all back with <Kbd>⌥⌘U</Kbd>.
+        </Feature>
+
+        <Feature
+          note="press ⌘S"
+          title="Out of the way, until you reach for it."
+          video="compact"
+          label="Compact mode hiding Zepper's sidebar, which floats back in at the window's edge"
+          tilt="1deg"
+        >
+          Compact mode gives the whole window to the page. Push the pointer to the edge and the sidebar floats back in, then
+          tucks itself away again.
+        </Feature>
+
+        <section className="mx-auto grid max-w-6xl gap-12 px-5 pb-24 pt-8 md:grid-cols-2 md:gap-10">
+          <div>
+            <Print name="swipe" label="A two-finger swipe going back a page in Zepper" tilt="-1.6deg" />
+            <h3 className={`${styles.display} mt-8 text-3xl font-extrabold text-[#2747d6]`}>Back with a swipe.</h3>
+            <p className="mt-2 max-w-sm text-[#14183a]/75">
+              Two fingers on the trackpad, and an arrow that fills up as you go, so you know when letting go will.
             </p>
           </div>
-
-          <div className="mt-12 grid gap-4 md:grid-cols-6">
-            <Card className="md:col-span-4" icon={Layers} title="Spaces" visual={<SpacesVisual />}>
-              A space for each part of your life, each with its own colours and, if you like, its own sign-ins: cookies,
-              logins and site data kept apart like separate profiles. Swipe between them on the trackpad.
-            </Card>
-            <Card className="md:col-span-2" icon={PanelLeft} title="Essentials" visual={<EssentialsVisual />}>
-              Your most-used sites one click away, signed in with that space&apos;s accounts.
-            </Card>
-            <Card className="md:col-span-3" icon={Command} title="Command bar" visual={<CommandVisual />}>
-              <Kbd>⌘</Kbd> <Kbd>T</Kbd> to search, open an address or jump to a tab you already have open. Bangs like{" "}
-              <span className="font-mono text-[0.9em] text-zinc-300">!yt</span> and{" "}
-              <span className="font-mono text-[0.9em] text-zinc-300">!gh</span> go straight to the site.
-            </Card>
-            <Card className="md:col-span-3" icon={Columns2} title="Split view and folders" visual={<SplitVisual />}>
-              Up to four pages side by side, stacked or in a grid. Pinned tabs that survive restarts, in folders you can
-              nest. Drag and drop for everything.
-            </Card>
-            <Card className="md:col-span-2" icon={KeyRound} title="Passwords and passkeys">
-              A password manager built in, with passkeys and Touch ID, kept encrypted on your Mac. Bring your logins over
-              from Chrome, Brave, Arc, 1Password and others.
-            </Card>
-            <Card className="md:col-span-2" icon={PictureInPicture2} title="Made for media">
-              Picture in picture when you leave a playing video, a now-playing card for audio in other tabs, and
-              Widevine for Netflix and Spotify.
-            </Card>
-            <Card className="md:col-span-2" icon={Gauge} title="Light on your Mac">
-              Memory Saver unloads tabs you haven&apos;t looked at in hours, the way Chrome does. Every window comes back
-              where you left it.
-            </Card>
-            <Card className="md:col-span-6" icon={Sparkles} title="On-device intelligence">
-              On Macs with Apple Intelligence: summarise a page or ask it questions, translate it in place, search your
-              history by what you remember, and tidy a messy space into folders. Nothing leaves your computer.
-            </Card>
+          <div className="md:mt-16">
+            <Print name="links" label="Pointing at links in Zepper shows where they go, in the corner of the page" tilt="1.4deg" width={1600} height={1036} />
+            <h3 className={`${styles.display} mt-8 text-3xl font-extrabold text-[#2747d6]`}>Know where a link goes.</h3>
+            <p className="mt-2 max-w-sm text-[#14183a]/75">
+              Point at one and its address shows in the corner, the site in bold, before you&apos;ve clicked anything.
+            </p>
           </div>
         </section>
 
         {/* Privacy */}
-        <section id="privacy" className="relative scroll-mt-20 py-24">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(45%_60%_at_15%_50%,rgba(95,134,245,0.14),transparent_70%)]"
-          />
-          <div className="relative mx-auto grid max-w-6xl gap-12 px-5 md:grid-cols-[0.9fr_1.1fr] md:items-center">
+        <Wave color={NAVY} />
+        <section id="privacy" className={`${styles.grain} scroll-mt-4 text-[#fbf4e4]`} style={{ background: NAVY, ...grain(0.45) }}>
+          <div className="mx-auto grid max-w-6xl items-center gap-14 px-5 py-24 md:grid-cols-[1.05fr_0.95fr] md:py-32">
             <div>
-              <p className="text-sm font-medium text-[#9db4ff]">Privacy</p>
-              <h2 className="mt-3 text-4xl font-semibold tracking-[-0.03em] text-zinc-50 md:text-5xl">
-                Private by default, not by settings.
-              </h2>
-              <p className="mt-5 text-lg leading-relaxed text-zinc-400">
-                Every protection is on out of the box. If a site needs one off, switch it off for that site alone from
-                the lock in the address bar. Private windows leave nothing behind when they close.
+              <Note color="#ffd166" className="-rotate-2">
+                nothing to set up
+              </Note>
+              <Heading className="md:text-[3.8rem]">
+                Private before you <span className={`${styles.serif} text-[1.08em] font-normal text-[#ffd166]`}>change a thing.</span>
+              </Heading>
+              <p className="mt-5 max-w-lg text-lg leading-relaxed text-[#fbf4e4]/75">
+                Every protection is on from the start. If a site ever needs one off, the lock in the address bar switches it
+                off for that site alone. Private windows leave nothing behind.
               </p>
-            </div>
-            <ul className="grid gap-3 sm:grid-cols-2">
-              {protections.map(({ icon: Icon, title: name, text }) => (
-                <li key={name} className="flex gap-3.5 rounded-2xl border border-white/[0.07] bg-white/[0.025] p-4">
-                  <Icon className="mt-0.5 h-5 w-5 shrink-0 text-[#9db4ff]" strokeWidth={1.8} />
-                  <div>
-                    <div className="font-medium text-zinc-100">{name}</div>
-                    <div className="mt-1 text-sm leading-relaxed text-zinc-500">{text}</div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-
-        {/* Make it yours */}
-        <section id="make-it-yours" className="mx-auto max-w-6xl scroll-mt-20 px-5 py-20">
-          <div className="grid gap-10 rounded-[32px] border border-white/[0.08] bg-gradient-to-br from-white/[0.05] to-transparent p-8 md:grid-cols-2 md:items-center md:p-12">
-            <div>
-              <p className="text-sm font-medium text-[#9db4ff]">Make it yours</p>
-              <h2 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-zinc-50 md:text-4xl">
-                No Chromium to compile.
-              </h2>
-              <p className="mt-4 leading-relaxed text-zinc-400">
-                Most browsers worth customising are Chromium forks: tens of gigabytes of source and hours of building
-                before you change a pixel. Zepper&apos;s Chromium comes prebuilt, and everything you see, the sidebar,
-                command bar, settings and themes, is TypeScript, React and CSS. A fresh fork runs in minutes.
-              </p>
-              <ul className="mt-6 space-y-2.5 text-zinc-300">
-                {[
-                  "Rebrand it with your own name, icon and colours",
-                  "Change the defaults: search engine, themes, settings",
-                  "Reshape the sidebar, or add panels and shortcuts",
-                  "Bring your own filter lists",
-                ].map((idea) => (
-                  <li key={idea} className="flex items-start gap-2.5">
-                    <Check className="mt-1 h-4 w-4 shrink-0 text-[#9db4ff]" />
-                    {idea}
+              <ul className="mt-9 grid gap-x-8 gap-y-5 sm:grid-cols-2">
+                {protections.map(([name, text]) => (
+                  <li key={name} className="flex gap-3">
+                    <Tick className="mt-0.5 h-6 w-6 shrink-0" />
+                    <div>
+                      <div className="font-semibold">{name}</div>
+                      <div className="mt-0.5 text-sm leading-relaxed text-[#fbf4e4]/60">{text}</div>
+                    </div>
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0b0e15] shadow-2xl">
-              <div className="flex items-center gap-2 border-b border-white/[0.07] px-4 py-3">
-                <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
-                <span className="h-3 w-3 rounded-full bg-[#febc2e]" />
-                <span className="h-3 w-3 rounded-full bg-[#28c840]" />
-                <span className="ml-2 text-xs text-zinc-500">Terminal</span>
+            <div className="relative">
+              <Print
+                name="privacy"
+                label="Zepper's site panel: the certificate, protections with 11 trackers blocked, and permissions"
+                tilt="1.6deg"
+                width={1600}
+                height={1088}
+              />
+              <div className="absolute -bottom-12 right-4 hidden rotate-[-4deg] md:block">
+                <Note color="#ffd166">11 trackers, gone</Note>
               </div>
-              <pre className="overflow-x-auto p-5 font-mono text-[0.85rem] leading-7 text-zinc-300">
-                <span className="text-zinc-500"># Fork on GitHub, then:</span>
-                {"\n"}
-                <span className="text-[#9db4ff]">git</span> clone github.com/you/zepper-browser
-                {"\n"}
-                <span className="text-[#9db4ff]">cd</span> zepper-browser
-                {"\n"}
-                <span className="text-[#9db4ff]">npm</span> install
-                {"\n"}
-                <span className="text-[#9db4ff]">npm</span> run dev
-                {"\n"}
-                <span className="text-emerald-400">✓</span> <span className="text-zinc-500">Zepper is running. Edit, save, see it.</span>
-              </pre>
             </div>
           </div>
         </section>
+        <Wave color={NAVY} flip />
 
-        {/* Download */}
-        <section id="download" className="relative scroll-mt-20 px-5 pb-28 pt-12">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-[520px] bg-[radial-gradient(50%_60%_at_50%_100%,rgba(95,134,245,0.28),transparent_70%)]"
-          />
-          <div className="relative mx-auto max-w-3xl text-center">
-            <Image
-              src="/zepper/icon@2x.png"
-              alt=""
-              width={88}
-              height={88}
-              className="mx-auto drop-shadow-[0_14px_32px_rgba(95,134,245,0.45)]"
-            />
-            <h2 className="mt-7 text-4xl font-semibold tracking-[-0.03em] text-zinc-50 md:text-5xl">Try Zepper.</h2>
-            <p className="mx-auto mt-4 max-w-xl text-lg text-zinc-400">
-              Free, open source and updated automatically. A short setup brings over your history and passwords from
-              the browser you use now.
-            </p>
-            <a
-              href={release.downloadUrl}
-              className="mt-8 inline-flex items-center gap-2.5 rounded-full bg-[#5f86f5] px-7 py-4 font-medium text-white shadow-[0_12px_40px_-10px_rgba(95,134,245,0.9)] transition hover:bg-[#6f93f7]"
-            >
-              <Download className="h-5 w-5" />
-              Download for Mac
-            </a>
-            <p className="mt-4 text-sm text-zinc-500">
-              {versionLabel} · Apple silicon · macOS 14 or later
-            </p>
+        {/* Everything else */}
+        <section className="mx-auto max-w-6xl px-5 py-24 md:py-28">
+          <div className="max-w-2xl">
+            <Note className="-rotate-2">and the rest of it</Note>
+            <Heading className="text-[#2747d6]">
+              Everything you&apos;d expect, <span className={`${styles.serif} font-normal`}>already there.</span>
+            </Heading>
+          </div>
+          <div className="mt-14 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            {more.map(({ icon: Icon, color, title: name, text }, i) => (
+              <div key={name} className="flex gap-4">
+                <span
+                  className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border-2 border-[#14183a] shadow-[3px_3px_0_#14183a]"
+                  style={{ background: color, transform: `rotate(${(i % 3) * 3 - 3}deg)` }}
+                >
+                  <Icon className="h-[22px] w-[22px] text-[#14183a]" strokeWidth={2} />
+                </span>
+                <div>
+                  <h3 className="text-lg font-bold">{name}</h3>
+                  <p className="mt-1 leading-relaxed text-[#14183a]/70">{text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
 
-            <ol className="mx-auto mt-12 grid max-w-3xl gap-3 text-left sm:grid-cols-3">
-              {[
-                ["Install", "Open the .dmg and drag Zepper into Applications."],
-                [
-                  "Open it once",
-                  "Zepper isn't notarized yet: in System Settings › Privacy & Security, click Open Anyway. Only the first time.",
-                ],
-                ["Move in", "Bring over your history and passwords, pick a look, and you're set."],
-              ].map(([step, text], i) => (
-                <li key={step} className="rounded-2xl border border-white/[0.08] bg-[#06080d]/60 p-5 backdrop-blur">
-                  <span className="grid h-7 w-7 place-items-center rounded-full bg-[#5f86f5]/15 text-sm font-semibold text-[#9db4ff]">
-                    {i + 1}
-                  </span>
-                  <div className="mt-3 font-medium text-zinc-100">{step}</div>
-                  <p className="mt-1 text-sm leading-relaxed text-zinc-500">{text}</p>
-                </li>
-              ))}
-            </ol>
+        {/* Make it yours */}
+        <section id="make-it-yours" className="mx-auto max-w-6xl scroll-mt-6 px-5 pb-28">
+          <div className={`${styles.grain} overflow-hidden rounded-[36px] bg-[#14183a] text-[#fbf4e4]`} style={grain(0.35)}>
+            <div className="grid items-center gap-12 p-8 md:grid-cols-2 md:p-14">
+              <div>
+                <Note color="#ffd166" className="-rotate-2">
+                  for the tinkerers
+                </Note>
+                <Heading className="md:text-[3.2rem]">
+                  No Chromium <span className={`${styles.serif} font-normal text-[#ffd166]`}>to compile.</span>
+                </Heading>
+                <p className="mt-5 leading-relaxed text-[#fbf4e4]/75">
+                  Most browsers worth changing are Chromium forks: tens of gigabytes of source and hours of building before you
+                  move a pixel. Zepper&apos;s Chromium comes prebuilt, and everything you see is TypeScript, React and CSS. A
+                  fork runs in minutes, and your changes show the moment you save.
+                </p>
+                <div className="mt-6 flex flex-wrap gap-2">
+                  {["Rebrand it", "Change the defaults", "Reshape the sidebar", "Bring your own filter lists"].map((idea) => (
+                    <span key={idea} className="rounded-full border border-[#fbf4e4]/25 px-3.5 py-1.5 text-sm text-[#fbf4e4]/85">
+                      {idea}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div className="relative">
+                <div className="rotate-[1.5deg] overflow-hidden rounded-2xl bg-[#0b0d1f] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.7)] ring-1 ring-white/10">
+                  <div className="flex items-center gap-2 border-b border-white/[0.07] px-4 py-3">
+                    <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
+                    <span className="h-3 w-3 rounded-full bg-[#febc2e]" />
+                    <span className="h-3 w-3 rounded-full bg-[#28c840]" />
+                  </div>
+                  <pre className="overflow-x-auto p-5 font-mono text-[0.86rem] leading-7 text-[#fbf4e4]/85">
+                    <span className="text-[#fbf4e4]/40"># fork it on GitHub, then</span>
+                    {"\n"}
+                    <span className="text-[#ffd166]">git</span> clone github.com/you/zepper-browser
+                    {"\n"}
+                    <span className="text-[#ffd166]">cd</span> zepper-browser
+                    {"\n"}
+                    <span className="text-[#ffd166]">npm</span> install
+                    {"\n"}
+                    <span className="text-[#ffd166]">npm</span> run dev
+                    {"\n"}
+                    <span className="text-[#7ee2a8]">✓</span> <span className="text-[#fbf4e4]/50">your Zepper is running</span>
+                  </pre>
+                </div>
+                <div className="absolute -top-10 right-2 hidden rotate-6 md:block">
+                  <Note color="#ffd166">it&apos;s just React</Note>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
       </main>
 
-      <footer className="border-t border-white/[0.06]">
-        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-8 text-sm text-zinc-500 md:flex-row md:items-center md:justify-between">
+      {/* Download */}
+      <div className="bg-[#fbf4e4]">
+        <Wave color={BLUE} />
+      </div>
+      <section id="download" className={`${styles.grain} text-center text-[#fbf4e4]`} style={{ background: BLUE, ...grain(0.7) }}>
+        <div className="mx-auto max-w-3xl px-5 py-24 md:py-32">
+          <Image
+            src="/zepper/icon@2x.png"
+            alt=""
+            width={104}
+            height={104}
+            className={`${styles.wobble} mx-auto drop-shadow-[0_16px_30px_rgba(10,14,60,0.45)]`}
+          />
+          <h2 className={`${styles.display} mt-8 text-[3rem] font-extrabold leading-[0.92] md:text-[5rem]`}>
+            Give your tabs <span className={`${styles.serif} font-normal text-[#fff6dc]`}>a home.</span>
+          </h2>
+          <p className="mx-auto mt-6 max-w-lg text-lg text-[#fbf4e4]/80">
+            Free, open source and updated on its own. Bring your history and passwords over from the browser you use now, in
+            about a minute.
+          </p>
+          <div className="mt-10 flex justify-center">
+            <DownloadButton href={release.downloadUrl} />
+          </div>
+          <p className="mt-6 text-sm text-[#fbf4e4]/60">{meta}</p>
+          <ol className="mx-auto mt-14 grid max-w-3xl gap-4 text-left sm:grid-cols-3">
+            {[
+              ["Drag it in", "Open the .dmg and drag Zepper into Applications."],
+              ["Open it once", "It isn't notarized yet: in System Settings › Privacy & Security, click Open Anyway. Just the first time."],
+              ["Move in", "Bring over your history and passwords, pick your colours, and you're home."],
+            ].map(([step, text], i) => (
+              <li
+                key={step}
+                className="rounded-3xl bg-[#fbf4e4] p-5 text-[#14183a] shadow-[0_20px_40px_-24px_rgba(10,14,60,0.8)]"
+                style={{ transform: `rotate(${[-1.5, 1, -0.5][i]}deg)` }}
+              >
+                <span className={`${styles.hand} text-3xl text-[#ff7a59]`}>{i + 1}.</span>
+                <div className="mt-1 font-bold">{step}</div>
+                <p className="mt-1 text-sm leading-relaxed text-[#14183a]/70">{text}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <footer className="text-[#fbf4e4]/60" style={{ background: NAVY }}>
+        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-8 text-sm md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-2.5">
-            <Image src="/zepper/icon.png" alt="" width={22} height={22} className="rounded-md" />
+            <Image src="/zepper/icon.png" alt="" width={24} height={24} className="rounded-md" />
             <span>
-              Zepper is free software under the GPL-3.0. Made by{" "}
-              <Link href="/" className="text-zinc-300 hover:text-white">
+              Free software under the GPL-3.0, made by{" "}
+              <Link href="/" className="font-semibold text-[#fbf4e4] hover:underline">
                 Dewan Shakil Akhtar
               </Link>
               .
             </span>
           </div>
-          <div className="flex gap-5">
-            <a href={repoUrl} className="hover:text-zinc-200">
+          <div className="flex flex-wrap gap-5">
+            <a href={repoUrl} className="hover:text-[#fbf4e4]">
               GitHub
             </a>
-            <a href={releasesUrl} className="hover:text-zinc-200">
+            <a href={releasesUrl} className="hover:text-[#fbf4e4]">
               Releases
             </a>
-            <a href={`${repoUrl}/blob/main/CHANGELOG.md`} className="hover:text-zinc-200">
+            <a href={`${repoUrl}/blob/main/CHANGELOG.md`} className="hover:text-[#fbf4e4]">
               Changelog
+            </a>
+            <a href={`${repoUrl}/issues`} className="hover:text-[#fbf4e4]">
+              Report a bug
             </a>
           </div>
         </div>
