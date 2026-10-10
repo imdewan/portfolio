@@ -445,7 +445,7 @@ export default async function ZepperPage() {
               Trackers out of it.
             </span>
           </h1>
-          <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-white/70 md:text-[1.15rem]">
+          <p className="mx-auto mt-5 max-w-2xl text-balance text-lg leading-relaxed text-white/70 md:text-[1.15rem]">
             A free, open-source browser for {linux ? "Mac and Linux" : "your Mac"}, with Spaces, a sidebar built for tabs, and
             privacy that&apos;s on from the very first page.
           </p>
