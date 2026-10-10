@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 /** Whether this is an Intel Mac, as far as the browser lets a page tell (Apple silicon when it can't). */
 async function onIntelMac(): Promise<boolean> {
@@ -21,22 +21,30 @@ async function onIntelMac(): Promise<boolean> {
   }
 }
 
+/** A Linux desktop (Android says Linux too, and gets the Mac link: there's nothing for phones). */
+const onLinux = (): boolean => /Linux|X11/.test(navigator.userAgent) && !/Android/.test(navigator.userAgent);
+const never = () => () => {};
+
 /**
  * A download link that gets the Apple silicon build, or the Intel one on an Intel Mac (when the latest
- * release has one).
+ * release has one). On Linux it goes to `linux` instead (the Linux packages), with its own label.
  */
-export function MacDownload({
+export function DownloadLink({
   href,
   intelHref,
+  linux,
   className,
   children,
 }: {
   href: string;
   intelHref: string | null;
+  linux?: { href: string; children: React.ReactNode } | null;
   className?: string;
   children: React.ReactNode;
 }) {
   const [target, setTarget] = useState(href);
+  // Known only in the browser: the page is first drawn with the Mac link.
+  const isLinux = useSyncExternalStore(never, onLinux, () => false);
   useEffect(() => {
     if (!intelHref) return;
     let alive = true;
@@ -45,6 +53,13 @@ export function MacDownload({
       alive = false;
     };
   }, [intelHref]);
+  if (isLinux && linux) {
+    return (
+      <a href={linux.href} className={className}>
+        {linux.children}
+      </a>
+    );
+  }
   return (
     <a href={target} className={className}>
       {children}

@@ -5,6 +5,7 @@ import { Bricolage_Grotesque, Instrument_Serif } from "next/font/google";
 import {
   ArrowRight,
   Camera,
+  Download,
   Clapperboard,
   FolderTree,
   Gauge,
@@ -20,15 +21,17 @@ import { GithubIcon } from "@/components/icons";
 import { siteUrl } from "@/lib/site";
 import { AppleLogo, Check, Sparkle, Wave } from "./art";
 import { LoopVideo } from "./LoopVideo";
-import { MacDownload } from "./MacDownload";
-import { latestRelease, releasesUrl, repoUrl } from "./release";
+import { DownloadLink } from "./DownloadLink";
+import { latestRelease, releasesUrl, repoUrl, type Release } from "./release";
 import styles from "./zepper.module.css";
 
 // The version shown follows the latest release (checked every few minutes); the buttons go through
-// /zepper/download, which finds the newest .dmg when you click (the Intel one on an Intel Mac).
+// /zepper/download, which finds the newest .dmg when you click (the Intel one on an Intel Mac), and on
+// Linux they go to the Linux packages instead.
 export const revalidate = 300;
 const DOWNLOAD = "/zepper/download";
 const DOWNLOAD_INTEL = "/zepper/download?mac=intel";
+const LINUX_SECTION = "#linux";
 
 const display = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-display", axes: ["opsz", "wdth"] });
 const serif = Instrument_Serif({ subsets: ["latin"], weight: "400", style: ["normal", "italic"], variable: "--font-serif" });
@@ -38,9 +41,9 @@ const DEEP = "#0e1538";
 /** A macOS window's corners (12pt on a 1280×800 window), so a bare window keeps its shape at any size. */
 const WINDOW_CORNERS = "0.95% / 1.52%";
 
-const title = "Zepper · A private browser for your Mac";
+const title = "Zepper · A private browser for Mac and Linux";
 const description =
-  "Zepper is a free, open-source browser for macOS: Spaces, a sidebar built for tabs, split view and privacy protections that are on from the first page. Built on Chromium, made to be changed.";
+  "Zepper is a free, open-source browser for macOS and Linux: Spaces, a sidebar built for tabs, split view and privacy protections that are on from the first page. Built on Chromium, made to be changed.";
 
 export const metadata: Metadata = {
   title: { absolute: title },
@@ -74,11 +77,15 @@ const strip = [
   "Secure DNS",
 ];
 
-/** `intel`: the latest release has a build for Intel Macs too. */
-const facts = (intel: boolean) => [
+/** `intel`: the latest release has a build for Intel Macs too; `linux`: Linux packages. */
+const facts = (intel: boolean, linux: boolean) => [
   ["Free and open source", "GPL-3.0, no account needed"],
   ["Built on Chromium", "Sites work as they do in Chrome"],
-  intel ? ["Apple silicon and Intel", "Native on both, macOS 14 or later"] : ["Native on Apple silicon", "macOS 14 or later"],
+  linux
+    ? ["Mac and Linux", "macOS 14 or later, Apple silicon and Intel; Linux on x64 and Arm"]
+    : intel
+      ? ["Apple silicon and Intel", "Native on both, macOS 14 or later"]
+      : ["Native on Apple silicon", "macOS 14 or later"],
   ["Updates itself", "Quietly, in the background"],
 ];
 
@@ -106,7 +113,7 @@ const more = [
   { icon: RotateCcw, title: "Right where you left it", text: "Every window, space and tab comes back when you reopen Zepper." },
 ];
 
-const faq = (intel: boolean) => [
+const faq = (intel: boolean, linux: boolean) => [
   ["Is Zepper free?", "Yes. It's free and open source under the GPL-3.0. There's no account to make and nothing to pay for."],
   [
     "Which Macs does it run on?",
@@ -114,6 +121,14 @@ const faq = (intel: boolean) => [
       ? "Any Mac on macOS 14 or later, with Apple silicon or Intel: the download button gets the right one for yours. Translate and summarise use Apple Intelligence, so they need a Mac with Apple silicon."
       : "Macs with Apple silicon, on macOS 14 or later.",
   ],
+  ...(linux
+    ? [
+        [
+          "Does it run on Linux?",
+          "Yes, on x64 and Arm: a .deb for Ubuntu, Debian and Mint, an .rpm for Fedora and openSUSE, and an AppImage for Arch and the rest. Everything works as it does on a Mac, except the Apple Intelligence features and passkeys through macOS. On Ubuntu 24.04 and later, use the .deb.",
+        ],
+      ]
+    : []),
   [
     "Why does macOS stop it the first time?",
     "Zepper isn't notarized by Apple yet. The first time you open it, go to System Settings › Privacy & Security and click Open Anyway. After that it opens like any other app, and updates install themselves.",
@@ -125,6 +140,12 @@ const faq = (intel: boolean) => [
   ["Do Chrome extensions work?", "Yes. Install them from the Chrome Web Store, as you would in Chrome."],
   ["Do streaming sites work?", "Yes. Zepper has Widevine support: turn it on in Settings › Media, or accept the prompt when a streaming site asks for it."],
 ];
+
+const linuxPackages = [
+  { kind: "deb", name: ".deb", distros: "Ubuntu, Debian, Linux Mint, Pop!_OS" },
+  { kind: "rpm", name: ".rpm", distros: "Fedora, openSUSE" },
+  { kind: "appimage", name: "AppImage", distros: "Arch, Manjaro and the rest" },
+] as const;
 
 const spaceShots = [
   { src: "/zepper/space-personal.webp", name: "Personal", left: "0%", top: "0%" },
@@ -233,16 +254,87 @@ function Feature({
   );
 }
 
-function DownloadButton({ intel }: { intel: boolean }) {
+function DownloadButton({ intel, linux }: { intel: boolean; linux: boolean }) {
   return (
-    <MacDownload
+    <DownloadLink
       href={DOWNLOAD}
       intelHref={intel ? DOWNLOAD_INTEL : null}
+      linux={
+        linux
+          ? {
+              href: LINUX_SECTION,
+              children: (
+                <>
+                  <Download className="h-[18px] w-[18px]" strokeWidth={2.2} />
+                  Download for Linux
+                </>
+              ),
+            }
+          : null
+      }
       className="inline-flex items-center gap-2.5 rounded-full bg-white px-6 py-3.5 text-[1rem] font-semibold text-[#18245f] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] transition hover:bg-[#eef1ff]"
     >
       <AppleLogo className="h-[18px] w-[18px] -translate-y-px" />
       Download for Mac
-    </MacDownload>
+    </DownloadLink>
+  );
+}
+
+/** Zepper on Linux: the recording, and a .deb, an .rpm and an AppImage for each processor. */
+function LinuxSection({ packages }: { packages: Release["linux"] }) {
+  return (
+    <section id="linux" className="mx-auto grid max-w-6xl scroll-mt-6 items-center gap-10 px-5 pb-24 md:grid-cols-[0.8fr_1.2fr] md:gap-16">
+      <div>
+        <Eyebrow>
+          Linux <Kbd>x64</Kbd>
+          <Kbd>Arm</Kbd>
+        </Eyebrow>
+        <Heading className="text-[#18245f]">On Linux, too.</Heading>
+        <p className="mt-5 max-w-md text-[1.07rem] leading-relaxed text-[#111633]/70">
+          The same Zepper on Ubuntu, Fedora, Arch and the rest, tested on each. The sidebar sits on the right with the
+          window&apos;s buttons in its corner, or give it your desktop&apos;s own title bar.
+        </p>
+        <div className="mt-7 grid gap-2.5">
+          {linuxPackages
+            .filter(({ kind }) => packages[kind])
+            .map(({ kind, name, distros }) => (
+              <div key={kind} className="flex items-center justify-between gap-4 rounded-2xl bg-white px-4 py-3.5 ring-1 ring-[#111633]/[0.08]">
+                <div className="min-w-0">
+                  <div className="font-semibold text-[#18245f]">{name}</div>
+                  <div className="text-sm text-[#111633]/60">{distros}</div>
+                </div>
+                <div className="flex shrink-0 gap-2">
+                  {packages[kind]?.x64 ? (
+                    <a
+                      href={`/zepper/download?linux=${kind}`}
+                      className="rounded-full bg-[#18245f] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2c47c4]"
+                    >
+                      x64
+                    </a>
+                  ) : null}
+                  {packages[kind]?.arm64 ? (
+                    <a
+                      href={`/zepper/download?linux=${kind}&arch=arm64`}
+                      className="rounded-full px-4 py-2 text-sm font-semibold text-[#18245f] ring-1 ring-[#18245f]/20 transition hover:bg-[#18245f]/[0.05]"
+                    >
+                      Arm
+                    </a>
+                  ) : null}
+                </div>
+              </div>
+            ))}
+        </div>
+        <p className="mt-4 max-w-md text-sm leading-relaxed text-[#111633]/55">
+          On Ubuntu 24.04 and later, use the .deb. The AppImage updates itself; the others show an Update button.
+        </p>
+      </div>
+      <Clip
+        name="linux"
+        label="Zepper on a Linux desktop: a pinned tab, the command bar, split view, its spaces and its own window buttons"
+        width={1920}
+        height={1200}
+      />
+    </section>
   );
 }
 
@@ -265,8 +357,11 @@ function OtherMacs({ className }: { className: string }) {
 export default async function ZepperPage() {
   const release = await latestRelease();
   const intel = release.intelUrl !== null;
+  const linux = Object.keys(release.linux).length > 0;
   const macs = intel ? "Apple silicon and Intel" : "Apple silicon";
-  const meta = [release.version ? `Version ${release.version}` : null, macs, "macOS 14 or later"].filter(Boolean).join(" · ");
+  const meta = [release.version ? `Version ${release.version}` : null, macs, "macOS 14 or later", linux ? "Linux" : null]
+    .filter(Boolean)
+    .join(" · ");
   const grain = (amount: number) => ({ ["--grain" as string]: amount }) as React.CSSProperties;
   // How far the hero's window reaches up into the navy (the rest sits on the cream below).
   const overlap = "clamp(170px, 28vw, 400px)";
@@ -283,7 +378,7 @@ export default async function ZepperPage() {
           description,
           url: `${siteUrl}/zepper`,
           applicationCategory: "BrowserApplication",
-          operatingSystem: "macOS 14 or later",
+          operatingSystem: linux ? "macOS 14 or later, Linux" : "macOS 14 or later",
           ...(release.version ? { softwareVersion: release.version } : {}),
           downloadUrl: release.downloadUrl,
           license: "https://www.gnu.org/licenses/gpl-3.0.html",
@@ -306,6 +401,11 @@ export default async function ZepperPage() {
             <a href="#privacy" className="transition-colors hover:text-white">
               Privacy
             </a>
+            {linux ? (
+              <a href={LINUX_SECTION} className="transition-colors hover:text-white">
+                Linux
+              </a>
+            ) : null}
             <a href="#developers" className="transition-colors hover:text-white">
               Developers
             </a>
@@ -317,14 +417,15 @@ export default async function ZepperPage() {
               GitHub
             </a>
           </nav>
-          <MacDownload
+          <DownloadLink
             href={DOWNLOAD}
             intelHref={intel ? DOWNLOAD_INTEL : null}
+            linux={linux ? { href: LINUX_SECTION, children: "Download" } : null}
             className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#18245f] transition hover:bg-[#eef1ff]"
           >
             <AppleLogo className="h-3.5 w-3.5 -translate-y-px" />
             Download
-          </MacDownload>
+          </DownloadLink>
         </header>
 
         <div className="mx-auto max-w-4xl px-5 pb-10 pt-6 text-center md:pt-8">
@@ -345,11 +446,11 @@ export default async function ZepperPage() {
             </span>
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-white/70 md:text-[1.15rem]">
-            A free, open-source browser for your Mac, with Spaces, a sidebar built for tabs, and privacy that&apos;s on from
-            the very first page.
+            A free, open-source browser for {linux ? "Mac and Linux" : "your Mac"}, with Spaces, a sidebar built for tabs, and
+            privacy that&apos;s on from the very first page.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <DownloadButton intel={intel} />
+            <DownloadButton intel={intel} linux={linux} />
             <a
               href={repoUrl}
               className="inline-flex items-center gap-2.5 rounded-full px-6 py-3.5 font-semibold text-white ring-1 ring-white/25 transition hover:bg-white/[0.06] hover:ring-white/40"
@@ -366,6 +467,14 @@ export default async function ZepperPage() {
             ) : null}
             {release.version ? " · " : ""}
             {macs} · macOS 14 or later
+            {linux ? (
+              <>
+                {" · "}
+                <a href={LINUX_SECTION} className="text-white/80 underline-offset-4 hover:text-white hover:underline">
+                  Linux
+                </a>
+              </>
+            ) : null}
           </p>
         </div>
         <div style={{ height: overlap }} />
@@ -378,7 +487,7 @@ export default async function ZepperPage() {
             <WindowClip name="showcase" label="Zepper in one take: Tidy sorting a messy space, the command bar opening Mount Fuji with a bang, split view, compact mode and a swipe to another space" width={1920} height={1200} />
           </div>
           <dl className="mx-auto grid max-w-6xl grid-cols-2 gap-x-6 gap-y-8 px-5 pb-16 pt-14 md:grid-cols-4 md:pt-16">
-            {facts(intel).map(([fact, detail]) => (
+            {facts(intel, linux).map(([fact, detail]) => (
               <div key={fact} className="border-l-2 border-[#18245f]/15 pl-4">
                 <dt className="font-semibold text-[#18245f]">{fact}</dt>
                 <dd className="mt-1 text-sm text-[#111633]/60">{detail}</dd>
@@ -621,6 +730,8 @@ export default async function ZepperPage() {
             </div>
           </section>
 
+          {linux ? <LinuxSection packages={release.linux} /> : null}
+
           {/* FAQ */}
           <section id="faq" className="mx-auto max-w-6xl scroll-mt-6 px-5 pb-28">
             <div className="grid gap-12 md:grid-cols-[0.8fr_1.2fr]">
@@ -636,7 +747,7 @@ export default async function ZepperPage() {
                 </p>
               </div>
               <dl className="divide-y divide-[#111633]/10 border-y border-[#111633]/10">
-                {faq(intel).map(([question, answer]) => (
+                {faq(intel, linux).map(([question, answer]) => (
                   <div key={question} className="py-6">
                     <dt className="font-semibold text-[#111633]">{question}</dt>
                     <dd className="mt-2 leading-relaxed text-[#111633]/65">{answer}</dd>
@@ -660,10 +771,15 @@ export default async function ZepperPage() {
             about a minute.
           </p>
           <div className="mt-10 flex justify-center">
-            <DownloadButton intel={intel} />
+            <DownloadButton intel={intel} linux={linux} />
           </div>
           <p className="mt-5 text-sm text-white/50">{meta}</p>
           {intel ? <OtherMacs className="mt-1.5 block text-sm text-white/50" /> : null}
+          {linux ? (
+            <a href={LINUX_SECTION} className="mt-1.5 block text-sm text-white/50 underline underline-offset-4 hover:text-white">
+              On Linux? Get the .deb, .rpm or AppImage
+            </a>
+          ) : null}
           <ol className="mx-auto mt-14 grid max-w-3xl gap-4 text-left sm:grid-cols-3">
             {[
               ["Install", "Open the .dmg and drag Zepper into Applications."],
