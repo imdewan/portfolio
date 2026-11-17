@@ -29,7 +29,7 @@ export const projects = [
   {
     name: "Zepper",
     detail:
-      "A free, open-source browser for macOS: Spaces, a sidebar built for tabs, split view and privacy on by default. Built on Chromium, with an interface in React you can make your own.",
+      "A free, open-source browser for macOS and Linux: Spaces, a sidebar built for tabs, split view and privacy on by default. Built on Chromium, with an interface in React you can make your own.",
     href: "/zepper",
     status: "Current | Maker",
   },

@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Bricolage_Grotesque, Instrument_Serif } from "next/font/google";
 import {
+  AppWindow,
   ArrowRight,
   Camera,
   Download,
@@ -12,6 +13,7 @@ import {
   KeyRound,
   Languages,
   PictureInPicture2,
+  Printer,
   Puzzle,
   RotateCcw,
   SquareStack,
@@ -104,11 +106,13 @@ const more = [
   { icon: SquareStack, title: "Essentials", text: "Your most-used sites a click away, signed in with each space's accounts." },
   { icon: FolderTree, title: "Pinned tabs and folders", text: "Tabs that stay, sorted into folders you can nest." },
   { icon: KeyRound, title: "Passwords and passkeys", text: "Built in, encrypted on your Mac, unlocked with Touch ID." },
+  { icon: AppWindow, title: "Quick View", text: "A link to another site opens in a card over your page, to close or keep as a tab." },
   { icon: PictureInPicture2, title: "Picture in picture", text: "Leave a playing video and it comes with you." },
   { icon: Clapperboard, title: "Widevine support", text: "Protected video and music from streaming sites, whenever you turn it on." },
   { icon: Gauge, title: "Memory Saver", text: "Tabs you haven't looked at in hours give their memory back." },
   { icon: Puzzle, title: "Chrome extensions", text: "Install them straight from the Chrome Web Store." },
   { icon: Camera, title: "Captures", text: "⇧⌘2 copies an element, a region or the whole page." },
+  { icon: Printer, title: "Print preview", text: "See the page as it will print, then save it as a PDF or print it." },
   { icon: Languages, title: "Translate and summarise", text: "On Macs with Apple Intelligence, without leaving your computer." },
   { icon: RotateCcw, title: "Right where you left it", text: "Every window, space and tab comes back when you reopen Zepper." },
 ];
